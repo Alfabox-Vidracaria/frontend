@@ -4,7 +4,8 @@
 }
 
 p {
-    padding-left: 1.25rem;
+    padding: 1.25rem;
+
     font-weight: 600;
     font-size: 16px;
     color: var(--p-red-600);
@@ -21,7 +22,7 @@ p {
 
 /* Classe ativada quando isExpanded for true */
 .sidebar-container.expanded {
-    width: 250px; /* Largura quando expandido */
+    width: 220px; /* Largura quando expandido */
     border-right: 1px solid var(--p-surface-200); /* Opcional: divisória visual */
 }
 
