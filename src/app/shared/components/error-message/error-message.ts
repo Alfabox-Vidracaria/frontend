@@ -58,6 +58,8 @@ export class ErrorMessageComponent {
         return 'Formato inválido';
       case 'invalidCpf':
         return 'CPF inválido';
+      case 'invalidCnpj':
+        return 'CNPJ inválido';
       default:
         return 'Campo inválido';
     }

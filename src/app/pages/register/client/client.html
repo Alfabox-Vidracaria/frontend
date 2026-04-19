@@ -1,0 +1,282 @@
+<div class="page">
+  <h1><span>|</span> Clientes</h1>
+
+  <!-- ═══ Card de Cadastro ═══ -->
+  <div class="card">
+    <h3>Cadastrar Cliente</h3>
+    <form class="client-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <!-- Coluna esquerda: dados do cliente -->
+      <div class="col-left">
+        <!-- Nome -->
+        <div class="form-field">
+          <p-floatlabel variant="on" class="full-width-control">
+            <input pInputText id="client_name" formControlName="name" [invalid]="isInvalid('name')" />
+            <label for="client_name">Nome do Cliente</label>
+          </p-floatlabel>
+          <app-error-message [control]="form.get('name')"></app-error-message>
+        </div>
+
+        <!-- Tipo de Pessoa + Documento -->
+        <div class="person-doc-row">
+          <div>
+            <p-selectbutton
+              [options]="personTypeOptions"
+              formControlName="personType"
+              optionLabel="label"
+              optionValue="value"
+              [allowEmpty]="false"
+            />
+          </div>
+          <div class="form-field doc-field">
+            <p-floatlabel variant="on" class="full-width-control">
+              <input
+                pInputText
+                id="client_document"
+                formControlName="document"
+                [mask]="documentMask"
+                [dropSpecialCharacters]="true"
+                [invalid]="isInvalid('document')"
+                style="text-transform: uppercase"
+              />
+              <label for="client_document">{{ documentLabel }}</label>
+            </p-floatlabel>
+            <app-error-message [control]="form.get('document')"></app-error-message>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coluna direita: telefones -->
+      <div class="col-right">
+        <app-multi-input
+          formControlName="phones"
+          label="Telefone"
+          [min]="1"
+          [max]="3"
+          masks="(00) 0000-0000||(00) 00000-0000"
+          scrollHeight="149px"
+        />
+      </div>
+
+      <!-- Botão salvar -->
+      <div class="col-action">
+        <p-button type="submit" label="Salvar" [disabled]="form.invalid || saving" [loading]="saving" icon="pi pi-save" />
+      </div>
+    </form>
+  </div>
+
+  <!-- ═══ Card de Listagem ═══ -->
+  <div class="card">
+    <h3>Clientes Cadastrados</h3>
+
+    <p-table
+      #dt
+      stripedRows
+      [value]="clients"
+      [loading]="loading"
+      [paginator]="true"
+      [rows]="20"
+      [rowsPerPageOptions]="[10, 20, 50]"
+      [tableStyle]="{ 'min-width': '70rem' }"
+      dataKey="id"
+    >
+
+      <!-- Cabeçalho -->
+      <ng-template #header>
+        <tr>
+          <th pSortableColumn="name" style="min-width: 16rem; width: 30%">
+            <div class="column-header">
+              Nome
+              <p-sortIcon field="name" />
+            </div>
+          </th>
+          <th style="width: 10rem">Tipo</th>
+         <th style="min-width: 15rem; width: 15%">Documento</th>
+         <th style="min-width: 28rem; width: 25%">Telefones</th>
+          <th style="width: 10rem">Status</th>
+          <th style="width: 10rem; text-align: center">Ações</th>
+        </tr>
+        <!-- Linha de filtros -->
+        <tr>
+          <th>
+            <p-columnFilter type="text" field="name" placeholder="Filtrar por nome" matchMode="contains" />
+          </th>
+          <th>
+            <p-columnFilter field="personType" matchMode="equals" [showMenu]="false">
+              <ng-template #filter let-value let-filterCallback="filterCallback">
+                <p-select
+                  [options]="personTypeFilterOptions"
+                  [ngModel]="value"
+                  (onChange)="filterCallback($event.value)"
+                  placeholder="Todos"
+                  [showClear]="true"
+                  [style]="{ 'min-width': '7rem' }"
+                >
+                  <ng-template #selectedItem let-selected>
+                    <p-tag [value]="selected.label" [severity]="getPersonTypeSeverity(selected.value)" />
+                  </ng-template>
+                  <ng-template #item let-option>
+                    <p-tag [value]="option.label" [severity]="getPersonTypeSeverity(option.value)" />
+                  </ng-template>
+                </p-select>
+              </ng-template>
+            </p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="text" field="document" placeholder="Filtrar por documento" matchMode="stripContains" [showMenu]="false" />
+          </th>
+          <th>
+            <p-columnFilter type="text" field="phonesText" placeholder="Filtrar por telefone" matchMode="stripContains" [showMenu]="false" />
+          </th>
+          <th>
+            <p-columnFilter field="isActive" matchMode="equals" [showMenu]="false">
+              <ng-template #filter let-value let-filterCallback="filterCallback">
+                <p-select
+                  [options]="statusOptions"
+                  [ngModel]="value"
+                  (onChange)="filterCallback($event.value)"
+                  placeholder="Todos"
+                  [showClear]="true"
+                  [style]="{ 'min-width': '8rem' }"
+                >
+                  <ng-template #selectedItem let-selected>
+                    <p-tag [value]="selected.label" [severity]="getStatusSeverity(selected.value)" />
+                  </ng-template>
+                  <ng-template #item let-option>
+                    <p-tag [value]="option.label" [severity]="getStatusSeverity(option.value)" />
+                  </ng-template>
+                </p-select>
+              </ng-template>
+            </p-columnFilter>
+          </th>
+          <th></th>
+        </tr>
+      </ng-template>
+
+      <!-- Corpo -->
+      <ng-template #body let-client>
+        <tr>
+          <td>{{ client.name }}</td>
+          <td>
+            <p-tag [value]="getPersonTypeLabel(client.personType)" [severity]="getPersonTypeSeverity(client.personType)" />
+          </td>
+          <td>{{ formatDocument(client) }}</td>
+          <td>
+            <div class="phones-cell">
+              @for (phone of client.phones; track phone.id) {
+                <p-tag [value]="phone.number | phoneFormat" severity="secondary" />
+              }
+              @if (client.phones.length === 0) {
+                <span class="no-data">—</span>
+              }
+            </div>
+          </td>
+          <td>
+            <p-tag [value]="getStatusLabel(client.isActive)" [severity]="getStatusSeverity(client.isActive)" />
+          </td>
+          <td class="actions">
+            <p-button
+              icon="pi pi-pencil"
+              [rounded]="true"
+              [text]="true"
+              severity="info"
+              pTooltip="Editar"
+              tooltipPosition="top"
+              (click)="openEditDialog(client)"
+            />
+            <p-button
+              icon="pi pi-trash"
+              [rounded]="true"
+              [text]="true"
+              severity="danger"
+              pTooltip="Excluir"
+              tooltipPosition="top"
+              (click)="confirmDelete($event, client)"
+            />
+          </td>
+        </tr>
+      </ng-template>
+
+      <!-- Vazio -->
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="6" class="empty-message">Nenhum cliente encontrado.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<!-- ═══ Dialog de Edição ═══ -->
+<p-dialog
+  header="Editar Cliente"
+  [modal]="true"
+  [(visible)]="editDialogVisible"
+  [style]="{ width: '36rem' }"
+  [draggable]="false"
+  [resizable]="false"
+>
+  <form [formGroup]="editForm" class="edit-form">
+    <!-- Nome -->
+    <div class="form-field">
+      <p-floatlabel variant="on" class="full-width-control">
+        <input pInputText fluid id="edit_name" formControlName="name" [invalid]="isEditInvalid('name')" />
+        <label for="edit_name">Nome do Cliente</label>
+      </p-floatlabel>
+      <app-error-message [control]="editForm.get('name')"></app-error-message>
+    </div>
+
+    <!-- Tipo de Pessoa + Documento -->
+    <div class="edit-person-doc-row">
+      <div>
+        <p-selectbutton
+          [options]="personTypeOptions"
+          formControlName="personType"
+          optionLabel="label"
+          optionValue="value"
+          [allowEmpty]="false"
+        />
+      </div>
+      <div class="form-field doc-field">
+        <p-floatlabel variant="on" class="full-width-control">
+            <input
+            pInputText
+            fluid
+            id="edit_document"
+            formControlName="document"
+            [mask]="editDocumentMask"
+            [dropSpecialCharacters]="true"
+            [invalid]="isEditInvalid('document')"
+            style="text-transform: uppercase"
+          />
+          <label for="edit_document">{{ editDocumentLabel }}</label>
+        </p-floatlabel>
+        <app-error-message [control]="editForm.get('document')"></app-error-message>
+      </div>
+    </div>
+
+    <!-- Telefones -->
+     <div class="phones-edit-form">
+         <app-multi-input
+           formControlName="phones"
+           label="Telefone"
+           [min]="1"
+           [max]="3"
+           masks="(00) 0000-0000||(00) 00000-0000"
+           scrollHeight="149px"
+         />
+     </div>
+
+    <!-- Ativo -->
+    <div class="toggle-field">
+      <label for="edit_active">Ativo</label>
+      <p-toggleswitch formControlName="isActive" inputId="edit_active" />
+    </div>
+  </form>
+
+  <ng-template #footer>
+    <div class="dialog-footer">
+      <p-button label="Cancelar" icon="pi pi-times" severity="secondary" [outlined]="true" (click)="editDialogVisible = false" />
+      <p-button label="Salvar" icon="pi pi-save" [disabled]="editForm.invalid || editLoading" [loading]="editLoading" (click)="confirmEdit($event)" />
+    </div>
+  </ng-template>
+</p-dialog>

@@ -1,0 +1,63 @@
+<div class="multi-input-container">
+  <!-- Header: label + botão adicionar -->
+  <div class="multi-input-header">
+    <span class="multi-input-label">{{ label }}s</span>
+    @if (canAdd) {
+      <p-button
+        icon="pi pi-plus"
+        [label]="'Adicionar'"
+        severity="secondary"
+        size="small"
+        (click)="addItem()"
+      />
+    }
+  </div>
+
+  <!-- Área com borda e scroll -->
+  <div
+    class="multi-input-bordered"
+    [style.maxHeight]="scrollHeight"
+    [style.overflowY]="scrollHeight ? 'auto' : 'visible'"
+  >
+    @if (formArray.length === 0) {
+      <span class="multi-input-empty">Nenhum {{ label | lowercase }} adicionado.</span>
+    }
+    @for (group of formArray.controls; track $index; let i = $index) {
+      <div class="multi-input-row">
+        <div class="multi-input-field">
+          @if (masks) {
+            <input
+              pInputText
+              [formControl]="getControl(i)"
+              [mask]="masks"
+              [dropSpecialCharacters]="true"
+              [placeholder]="label + ' ' + (i + 1)"
+              [invalid]="isFieldInvalid(i)"
+              (blur)="onFieldBlur()"
+            />
+          } @else {
+            <input
+              pInputText
+              [formControl]="getControl(i)"
+              [placeholder]="label + ' ' + (i + 1)"
+              [invalid]="isFieldInvalid(i)"
+              (blur)="onFieldBlur()"
+            />
+          }
+          <app-error-message [control]="getControl(i)"></app-error-message>
+        </div>
+        @if (canRemove()) {
+          <p-button
+            icon="pi pi-trash"
+            severity="danger"
+            [text]="true"
+            [rounded]="true"
+            (click)="removeItem(i)"
+            pTooltip="Remover"
+            tooltipPosition="top"
+          />
+        }
+      </div>
+    }
+  </div>
+</div>

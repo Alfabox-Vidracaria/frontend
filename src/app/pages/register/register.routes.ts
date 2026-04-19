@@ -9,12 +9,12 @@ export const REGISTER_ROUTES: Routes = [
   },
   {
     path: 'clientes',
-    loadComponent: () => import('./customer/customer').then((m) => m.Customer),
+    loadComponent: () => import('./client/client').then((m) => m.Client),
   },
   {
     path: 'produtos',
     loadComponent: () => import('./product/product').then((m) => m.Product),
-    //canActivate: [roleGuard('ADMIN')],
+    canActivate: [roleGuard('ADMIN')],
   },
   {
     path: 'montadores',

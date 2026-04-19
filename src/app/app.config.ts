@@ -12,6 +12,7 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { provideEnvironmentNgxMask } from 'ngx-mask';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -23,6 +24,7 @@ export const appConfig: ApplicationConfig = {
     // - Quando implementar autenticação, adicione o authInterceptor aqui
     provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])),
     provideAnimations(),
+    provideEnvironmentNgxMask(),
     // Services globais do PrimeNG
     MessageService,
     ConfirmationService,
