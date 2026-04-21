@@ -11,14 +11,17 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { Subject, debounceTime, switchMap, of } from 'rxjs';
 import { ClientService } from '../../../shared/services/client.service';
 import { ServiceOrderService } from '../../../shared/services/service-order.service';
+import { SellerService } from '../../../shared/services/seller.service';
 import { Client, ClientPhone } from '../../../shared/models/client.model';
 import { ServiceOrderAddress } from '../../../shared/models/service-order.model';
+import { Seller } from '../../../shared/models/seller.model';
 import { cpfValidator } from '../../../shared/validators/cpf.validator';
 import { cnpjValidator } from '../../../shared/validators/cnpj.validator';
 import { CpfFormatPipe } from '../../../shared/pipes/cpf-format.pipe';
 import { CnpjFormatPipe } from '../../../shared/pipes/cnpj-format.pipe';
 import { PhoneFormatPipe } from '../../../shared/pipes/phone-format.pipe';
 import { SHARED_CRUD_IMPORTS } from '../../../shared/constants/shared-crud-imports';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-create-service-order',
@@ -29,14 +32,21 @@ import { SHARED_CRUD_IMPORTS } from '../../../shared/constants/shared-crud-impor
 export class CreateServiceOrder implements OnInit {
   private fb = inject(FormBuilder);
   private clientService = inject(ClientService);
+  private sellerService = inject(SellerService);
   private serviceOrderService = inject(ServiceOrderService);
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
+  private router = inject(Router);
+
+  return() {
+    this.router.navigate(['/os']);
+  }
 
   // ── Formulário principal da OS ────────────────────────────────────────
 
   form = this.fb.nonNullable.group({
     clientId: ['', Validators.required],
+    sellerId: ['', Validators.required],
     street: ['', Validators.maxLength(255)],
     addressNumber: ['', Validators.maxLength(50)],
     neighborhood: ['', Validators.maxLength(100)],
@@ -57,6 +67,13 @@ export class CreateServiceOrder implements OnInit {
   private clientAddresses: ServiceOrderAddress[] = [];
   /** Sugestões filtradas em tempo real conforme o usuário digita na rua. */
   addressSuggestions: ServiceOrderAddress[] = [];
+
+  // ── Vendedor (autocomplete) ───────────────────────────────────────────
+
+  selectedSeller: Seller | null = null;
+  /** Lista completa de vendedores ativos, carregada uma vez no init. */
+  private allSellers: Seller[] = [];
+  sellerSuggestions: Seller[] = [];
 
   // ── Dialog criar/editar cliente ───────────────────────────────────────
 
@@ -93,6 +110,13 @@ export class CreateServiceOrder implements OnInit {
 
     this.clientForm.controls.personType.valueChanges.subscribe(() => {
       this.updateDocumentValidator();
+    });
+
+    // Carrega vendedores ativos uma única vez ao iniciar
+    this.sellerService.findAll(true).subscribe({
+      next: (sellers) => {
+        this.allSellers = sellers;
+      },
     });
   }
 
@@ -178,6 +202,33 @@ export class CreateServiceOrder implements OnInit {
     return [addr.street, addr.addressNumber, addr.complement, addr.neighborhood, addr.city]
       .filter(Boolean)
       .join(', ');
+  }
+
+  // ── Vendedor handlers ─────────────────────────────────────────────────
+
+  searchSellers(event: AutoCompleteCompleteEvent): void {
+    const query = event.query.toLowerCase().trim();
+    this.sellerSuggestions = query
+      ? this.allSellers.filter((s) => s.name.toLowerCase().includes(query))
+      : [...this.allSellers];
+  }
+
+  onSellerSelect(event: AutoCompleteSelectEvent): void {
+    this.selectedSeller = event.value as Seller;
+    this.form.controls.sellerId.setValue(this.selectedSeller.id);
+  }
+
+  onSellerClear(): void {
+    this.selectedSeller = null;
+    this.form.controls.sellerId.setValue('');
+  }
+
+  // ── Submit ────────────────────────────────────────────────────────────
+
+  submit(): void {
+    this.form.markAllAsTouched();
+    if (this.form.invalid) return;
+    console.log('OS form values:', this.form.getRawValue());
   }
 
   // ── Dialog de cliente ─────────────────────────────────────────────────

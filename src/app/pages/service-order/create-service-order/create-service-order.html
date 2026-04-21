@@ -1,8 +1,14 @@
 <div class="page">
-  <h1><span>|</span> Nova Ordem de Serviço</h1>
+  <div class="title">
+    <h1><span>|</span> Nova Ordem de Serviço</h1>
+        <p-button label="Voltar" icon="pi pi-arrow-left" severity="secondary" [outlined]="true" (onClick)="return()"></p-button>
+  </div>
 
-  <!-- ═══ Card Cliente ═══ -->
-  <div class="card">
+  <!-- ═══ Linha: Cliente + Vendedor ═══ -->
+  <div class="cards-row">
+
+    <!-- ── Card Cliente ── -->
+    <div class="card card--client">
     <h3><span><i class="pi pi-user"></i></span> Cliente</h3>
 
     @if (!selectedClient) {
@@ -24,6 +30,7 @@
           emptyMessage="Nenhum cliente encontrado."
           [completeOnFocus]="false"
           scrollHeight="250px"
+          [invalid]="form.controls.clientId.invalid && form.controls.clientId.touched"
         >
           <!-- Item da lista -->
           <ng-template let-client #item>
@@ -51,7 +58,7 @@
             </div>
           </ng-template>
         </p-autocomplete>
-        <label for="client_search">Buscar Cliente</label>
+        <label for="client_search">Buscar Cliente *</label>
       </p-floatlabel>
     } @else {
       <!-- Cliente selecionado -->
@@ -107,6 +114,40 @@
       </div>
     }
   </div>
+
+    <!-- ── Card Vendedor ── -->
+    <div class="card card--seller">
+      <h3><span><i class="pi pi-id-card"></i></span> Vendedor</h3>
+
+      <p-floatlabel variant="on">
+        <p-autocomplete
+          inputId="seller_search"
+          [(ngModel)]="selectedSeller"
+          [suggestions]="sellerSuggestions"
+          (completeMethod)="searchSellers($event)"
+          (onSelect)="onSellerSelect($event)"
+          (onClear)="onSellerClear()"
+          [showClear]="true"
+          [forceSelection]="true"
+          [fluid]="true"
+          [minLength]="0"
+          [completeOnFocus]="true"
+          optionLabel="name"
+          dataKey="id"
+          emptyMessage="Nenhum vendedor ativo encontrado."
+          scrollHeight="250px"
+          [invalid]="form.controls.sellerId.invalid && form.controls.sellerId.touched"
+        >
+          <ng-template let-seller #item>
+            <span>{{ seller.name }}</span>
+          </ng-template>
+        </p-autocomplete>
+        <label for="seller_search">Vendedor *</label>
+      </p-floatlabel>
+    </div>
+
+  </div><!-- /.cards-row -->
+
   <div class="card">
     <h3><span><i class="pi pi-map-marker"></i></span> Endereço</h3>
 
@@ -186,6 +227,18 @@
 
     </div>
   </div>
+
+  <!-- ═══ Ações ═══ -->
+  <div class="form-actions">
+    <p-button
+      size="large"
+      label="Salvar"
+      icon="pi pi-save"
+      [disabled]="form.invalid"
+      (click)="submit()"
+    />
+  </div>
+
 </div>
 
 <!-- ═══ Dialog Criar/Editar Cliente ═══ -->
