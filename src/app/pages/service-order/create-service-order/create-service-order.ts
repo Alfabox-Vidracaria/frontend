@@ -1,4 +1,5 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, Validators } from '@angular/forms';
 import {
   AutoCompleteModule,
@@ -37,6 +38,7 @@ export class CreateServiceOrder implements OnInit {
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
   private router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
   return() {
     this.router.navigate(['/os']);
@@ -103,14 +105,17 @@ export class CreateServiceOrder implements OnInit {
           if (!query || query.length < 1) return of([]);
           return this.clientService.findAll(true, query);
         }),
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((clients) => {
         this.clientSuggestions = clients;
       });
 
-    this.clientForm.controls.personType.valueChanges.subscribe(() => {
-      this.updateDocumentValidator();
-    });
+    this.clientForm.controls.personType.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.updateDocumentValidator();
+      });
 
     // Carrega vendedores ativos uma única vez ao iniciar
     this.sellerService.findAll(true).subscribe({
