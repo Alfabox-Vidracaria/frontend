@@ -7,6 +7,7 @@ import { SHARED_CRUD_IMPORTS } from '../../shared/constants/shared-crud-imports'
 import { ServiceOrderService } from '../../shared/services/service-order.service';
 import { ServiceOrderListItem, PaymentStatus } from '../../shared/models/service-order.model';
 import { fromApiDate, toApiDate } from '../../shared/utils/date.utils';
+import { sumField, subtractCurrency } from '../../shared/utils/money.utils';
 import { Router } from '@angular/router';
 
 /** Linha da tabela — datas convertidas para Date para os filtros locais do PrimeNG. */
@@ -145,9 +146,9 @@ export class ServiceOrder implements OnInit {
   // ── KPIs ──────────────────────────────────────────────────────────────
 
   calculateTotals(rows: ServiceOrderRow[]): void {
-    this.totalVendido = rows.reduce((acc, r) => acc + r.totalAmount, 0);
-    this.totalRecebido = rows.reduce((acc, r) => acc + r.paidAmount, 0);
-    this.totalAReceber = this.totalVendido - this.totalRecebido;
+    this.totalVendido = sumField(rows, (r) => r.totalAmount);
+    this.totalRecebido = sumField(rows, (r) => r.paidAmount);
+    this.totalAReceber = subtractCurrency(this.totalVendido, this.totalRecebido);
   }
 
   onTableFilter(event: { filteredValue?: ServiceOrderRow[] | null }): void {
