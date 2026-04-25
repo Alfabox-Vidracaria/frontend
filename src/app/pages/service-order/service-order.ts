@@ -5,7 +5,11 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { SHARED_CRUD_IMPORTS } from '../../shared/constants/shared-crud-imports';
 import { ServiceOrderService } from '../../shared/services/service-order.service';
-import { ServiceOrderListItem, PaymentStatus } from '../../shared/models/service-order.model';
+import {
+  ServiceOrderListItem,
+  PaymentStatus,
+  ExecutionStatus,
+} from '../../shared/models/service-order.model';
 import { fromApiDate, toApiDate } from '../../shared/utils/date.utils';
 import { sumField, subtractCurrency } from '../../shared/utils/money.utils';
 import { Router } from '@angular/router';
@@ -61,9 +65,15 @@ export class ServiceOrder implements OnInit {
   // ── Filtros locais da tabela ──────────────────────────────────────────
 
   paymentStatusOptions = [
-    { label: 'Pago', value: 'PAGO' },
-    { label: 'Parcial', value: 'PARCIAL' },
-    { label: 'Aberto', value: 'ABERTO' },
+    { label: 'PAGO', value: 'PAGO' },
+    { label: 'PARCIAL', value: 'PARCIAL' },
+    { label: 'ABERTO', value: 'ABERTO' },
+  ];
+
+  executionStatusOptions = [
+    { label: 'PENDENTE', value: 'PENDENTE' },
+    { label: 'PARCIAL', value: 'EM_ANDAMENTO' },
+    { label: 'CONCLUÍDO', value: 'CONCLUIDO' },
   ];
 
   // ── Lifecycle ─────────────────────────────────────────────────────────
@@ -171,5 +181,17 @@ export class ServiceOrder implements OnInit {
     if (status === 'PAGO') return 'success';
     if (status === 'PARCIAL') return 'warn';
     return 'danger';
+  }
+
+  getExecutionStatusSeverity(status: ExecutionStatus): 'secondary' | 'info' | undefined {
+    if (status === 'CONCLUIDO') return undefined;
+    if (status === 'EM_ANDAMENTO') return 'info';
+    return 'secondary';
+  }
+
+  getExecutionStatusLabel(status: ExecutionStatus): string {
+    if (status === 'CONCLUIDO') return 'CONCLUÍDO';
+    if (status === 'EM_ANDAMENTO') return 'PARCIAL';
+    return 'PENDENTE';
   }
 }

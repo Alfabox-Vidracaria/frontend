@@ -149,10 +149,10 @@
           <th pSortableColumn="lastPaymentDate" style="width: 9rem">
             <div class="column-header">Último Pgto <p-sortIcon field="lastPaymentDate" /></div>
           </th>
-          <th style="width: 8rem">
+          <th style="width: 9rem">
             <div class="column-header">Status Pgto</div>
           </th>
-          <th style="width: 9rem">
+          <th style="width: 10.5rem">
             <div class="column-header">Status Exec.</div>
           </th>
           <th style="width: 10rem; text-align: center">Ações</th>
@@ -223,7 +223,28 @@
               </ng-template>
             </p-columnFilter>
           </th>
-          <th></th>
+          <th>
+            <p-columnFilter field="executionStatus" matchMode="equals" [showMenu]="false">
+              <ng-template #filter let-value let-filterCallback="filterCallback">
+                <p-select
+                  [options]="executionStatusOptions"
+                  [ngModel]="value"
+                  (onChange)="filterCallback($event.value)"
+                  placeholder="Todos"
+                  [showClear]="true"
+                  appendTo="body"
+                  [style]="{ 'min-width': '8rem' }"
+                >
+                  <ng-template #selectedItem let-selected>
+                    <p-tag [value]="selected.label" [severity]="getExecutionStatusSeverity(selected.value)" />
+                  </ng-template>
+                  <ng-template #item let-option>
+                    <p-tag [value]="option.label" [severity]="getExecutionStatusSeverity(option.value)" />
+                  </ng-template>
+                </p-select>
+              </ng-template>
+            </p-columnFilter>
+          </th>
           <th></th>
         </tr>
       </ng-template>
@@ -245,7 +266,10 @@
             />
           </td>
           <td>
-            <p-tag [value]="order.executionStatus" severity="secondary" />
+            <p-tag
+              [value]="getExecutionStatusLabel(order.executionStatus)"
+              [severity]="getExecutionStatusSeverity(order.executionStatus)"
+            />
           </td>
           <td class="actions">
             <p-button icon="pi pi-eye" [rounded]="true" [text]="true" severity="info" pTooltip="Visualizar" tooltipPosition="top" />
