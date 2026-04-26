@@ -32,13 +32,25 @@ h1, h2, h3 {
   .card--address { flex: 5; }
   .card--date    { flex: 1; min-width: 18rem; }
 
-  .card--items   { flex: 1; }
+  .card--items   { 
+    flex: 1; 
+    div {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      h3 {
+        display: flex;
+        gap: 0.75rem;
+      }
+    }
+  }
+  
 
   .card--observation { flex: 3; }
   .card--total       { flex: 1; min-width: 16rem; }
 
   app-os-items-input {
-    margin-top: -2.5rem;
+    margin-top: -3.5rem;
   }
 }
 

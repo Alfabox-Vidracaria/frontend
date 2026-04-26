@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, ViewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, Validators } from '@angular/forms';
 import { AutoCompleteCompleteEvent, AutoCompleteSelectEvent } from 'primeng/autocomplete';
@@ -8,6 +8,7 @@ import { Subject, debounceTime, switchMap, of } from 'rxjs';
 import { ClientService } from '../../../shared/services/client.service';
 import { ServiceOrderService } from '../../../shared/services/service-order.service';
 import { SellerService } from '../../../shared/services/seller.service';
+import { ProductService } from '../../../shared/services/product.service';
 import { Client, ClientPhone } from '../../../shared/models/client.model';
 import { ServiceOrderAddress } from '../../../shared/models/service-order.model';
 import { Seller } from '../../../shared/models/seller.model';
@@ -40,10 +41,13 @@ export class CreateServiceOrder implements OnInit {
   private clientService = inject(ClientService);
   private sellerService = inject(SellerService);
   private serviceOrderService = inject(ServiceOrderService);
+  private productService = inject(ProductService);
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
   private router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+
+  @ViewChild(OsItemsInputComponent) osItemsInput!: OsItemsInputComponent;
 
   return() {
     this.router.navigate(['/os']);
@@ -118,6 +122,15 @@ export class CreateServiceOrder implements OnInit {
   clientDialogVisible = false;
   clientDialogMode: 'create' | 'edit' = 'create';
   clientDialogLoading = false;
+
+  // ── Dialog cadastrar produto ──────────────────────────────────────────
+
+  productDialogVisible = false;
+  productDialogLoading = false;
+
+  productForm = this.fb.nonNullable.group({
+    name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
+  });
 
   personTypeOptions = [
     { label: 'PF', value: 'F' },
@@ -363,6 +376,43 @@ export class CreateServiceOrder implements OnInit {
         this.isSubmitting = false;
       },
     });
+  }
+
+  // ── Dialog de produto ─────────────────────────────────────────────────
+
+  openCreateProductDialog(): void {
+    this.productForm.reset({ name: '' });
+    this.productForm.markAsPristine();
+    this.productForm.markAsUntouched();
+    this.productDialogVisible = true;
+  }
+
+  saveProduct(): void {
+    this.productForm.markAllAsTouched();
+    if (this.productForm.invalid) return;
+
+    this.productDialogLoading = true;
+    this.productService.create(this.productForm.getRawValue()).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Sucesso',
+          detail: 'Produto cadastrado com sucesso!',
+        });
+        this.productDialogVisible = false;
+        this.productDialogLoading = false;
+        // Notifica o componente de itens para recarregar a lista de produtos ativos
+        this.osItemsInput?.reloadProducts();
+      },
+      error: () => {
+        this.productDialogLoading = false;
+      },
+    });
+  }
+
+  isProductDialogInvalid(field: string): boolean {
+    const ctrl = this.productForm.get(field);
+    return ctrl ? ctrl.invalid && (ctrl.touched || ctrl.dirty) : false;
   }
 
   // ── Dialog de cliente ─────────────────────────────────────────────────

@@ -100,6 +100,14 @@ export class OsItemsInputComponent implements ControlValueAccessor, Validator, O
     this.productsSub?.unsubscribe();
   }
 
+  /** Recarrega a lista de produtos ativos. Chamado pelo pai após cadastrar um novo produto. */
+  reloadProducts(): void {
+    this.productsSub?.unsubscribe();
+    this.productsSub = this.productService.findAll(true).subscribe((products) => {
+      this.allProducts = products;
+    });
+  }
+
   // ── ControlValueAccessor ──────────────────────────────────────────────
 
   writeValue(value: OsItemValue[] | null): void {

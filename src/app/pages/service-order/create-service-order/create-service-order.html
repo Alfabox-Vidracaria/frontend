@@ -248,7 +248,10 @@
   <!-- ═══ Linha: Itens do Serviço ═══ -->
   <div class="cards-row">
     <div class="card card--items">
-      <h3><span><i class="pi pi-box"></i></span> Itens</h3>
+      <div>
+        <h3><span><i class="pi pi-box"></i></span> Itens</h3>
+        <p-button label="Cadastrar Produto" size="small" severity="secondary" icon="pi pi-plus" (click)="openCreateProductDialog()"></p-button>
+      </div>
       <app-os-items-input
         [formControl]="form.controls.items"
         scrollHeight="350px"
@@ -473,6 +476,46 @@
         [disabled]="clientForm.invalid || clientDialogLoading"
         [loading]="clientDialogLoading"
         (click)="saveClient($event)"
+      />
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- ═══ Dialog Cadastrar Produto ═══ -->
+<p-dialog
+  header="Cadastrar Produto"
+  [modal]="true"
+  [(visible)]="productDialogVisible"
+  [style]="{ width: '28rem' }"
+  [draggable]="false"
+  [resizable]="false"
+  [focusOnShow]="false"
+>
+  <form [formGroup]="productForm" class="edit-form">
+    <div class="form-field">
+      <p-floatlabel variant="on" class="full-width-control">
+        <input
+          pInputText
+          fluid
+          id="product_name"
+          formControlName="name"
+          [invalid]="isProductDialogInvalid('name')"
+        />
+        <label for="product_name">Nome do Produto</label>
+      </p-floatlabel>
+      <app-error-message [control]="productForm.get('name')"></app-error-message>
+    </div>
+  </form>
+
+  <ng-template #footer>
+    <div class="dialog-footer">
+      <p-button label="Cancelar" icon="pi pi-times" severity="secondary" [outlined]="true" (click)="productDialogVisible = false" />
+      <p-button
+        label="Salvar"
+        icon="pi pi-save"
+        [disabled]="productForm.invalid || productDialogLoading"
+        [loading]="productDialogLoading"
+        (click)="saveProduct()"
       />
     </div>
   </ng-template>
