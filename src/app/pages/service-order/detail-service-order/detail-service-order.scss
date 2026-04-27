@@ -8,10 +8,85 @@ h1, h2, h3 {
   gap: 0.75rem;
 }
 
-.loading-state {
+// ── Skeleton ────────────────────────────────────────────────────────────
+
+.skeleton-toolbar {
+  .skeleton-toolbar-info {
+    display: flex;
+    gap: 3rem;
+    flex-wrap: wrap;
+  }
+  .skeleton-toolbar-actions {
+    display: flex;
+    gap: 1rem;
+  }
+}
+
+.skeleton-info-block {
   display: flex;
-  justify-content: center;
-  padding: 4rem 0;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.skeleton-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.skeleton-section-title {
+  margin-bottom: 1rem !important;
+}
+
+.skeleton-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  &--grow {
+    flex: 1 1 auto;
+  }
+}
+
+.skeleton-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.skeleton-table-row {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+
+  &--spaced {
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--p-surface-200);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}
+
+.skeleton-kpi-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem 2.5rem;
+}
+
+.skeleton-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.skeleton-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
 }
 
 .header {

@@ -3,6 +3,7 @@ import { CurrencyPipe, DatePipe } from '@angular/common';
 import { SHARED_CRUD_IMPORTS } from '../../../shared/constants/shared-crud-imports';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ProgressBarModule } from 'primeng/progressbar';
+import { SkeletonModule } from 'primeng/skeleton';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ServiceOrderService } from '../../../shared/services/service-order.service';
 import { ServiceOrderPaymentService } from '../../../shared/services/service-order-payment.service';
@@ -35,6 +36,7 @@ import { CnpjFormatPipe } from '../../../shared/pipes/cnpj-format.pipe';
     CurrencyPipe,
     DatePipe,
     ProgressBarModule,
+    SkeletonModule,
     PhoneFormatPipe,
     PaymentDialogComponent,
     ExecutionDialogComponent,
