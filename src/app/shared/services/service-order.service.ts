@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import {
   ServiceOrderAddress,
   UpdateAddress,
+  UpdateItems,
   CreateServiceOrder,
   ServiceOrder,
   ServiceOrderListItem,
@@ -42,6 +43,10 @@ export class ServiceOrderService {
 
   updateAddress(id: string, payload: UpdateAddress): Observable<void> {
     return this.http.patch<void>(`${this.baseUrl}/${id}/address`, payload);
+  }
+
+  updateItems(id: string, payload: UpdateItems): Observable<void> {
+    return this.http.patch<void>(`${this.baseUrl}/${id}/items`, payload);
   }
 
   getAddressesByClient(clientId: string): Observable<ServiceOrderAddress[]> {

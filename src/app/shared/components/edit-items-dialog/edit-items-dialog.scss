@@ -1,0 +1,68 @@
+.dialog-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding-top: 0.25rem;
+}
+
+.items-section-header {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+app-os-items-input {
+    margin-top: -3.3rem;
+}
+p-divider {
+    margin-top: -1rem;
+}
+
+.items-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--p-text-muted-color);
+}
+
+// Linha de baixo: Observação 75% | Total 25%
+.bottom-row {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.field-observation {
+  flex: 3;
+    textarea.observation-textarea {
+    width: 100%;
+    resize: none;
+    max-height: 33px;
+  }
+}
+
+.field-total {
+  flex: 1;
+}
+
+.observation-textarea {
+  width: 100%;
+  resize: none;
+}
+
+.full-width-control {
+  width: 100%;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}

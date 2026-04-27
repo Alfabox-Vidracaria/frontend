@@ -12,6 +12,10 @@ import { PaymentDialogComponent } from '../../../shared/components/payment-dialo
 import { ExecutionDialogComponent } from '../../../shared/components/execution-dialog/execution-dialog';
 import { ClientDialogComponent } from '../../../shared/components/client-dialog/client-dialog';
 import { AddressDialogComponent } from '../../../shared/components/address-dialog/address-dialog';
+import {
+  EditItemsDialogComponent,
+  EditItemsResult,
+} from '../../../shared/components/edit-items-dialog/edit-items-dialog';
 import { Client } from '../../../shared/models/client.model';
 import {
   ServiceOrderDetail,
@@ -43,6 +47,7 @@ import { CnpjFormatPipe } from '../../../shared/pipes/cnpj-format.pipe';
     ExecutionDialogComponent,
     ClientDialogComponent,
     AddressDialogComponent,
+    EditItemsDialogComponent,
   ],
   providers: [],
   templateUrl: './detail-service-order.html',
@@ -75,6 +80,9 @@ export class DetailServiceOrder implements OnInit {
 
   // ── Dialog Endereço ───────────────────────────────────────────────────
   addressDialogVisible = false;
+
+  // ── Dialog Itens ──────────────────────────────────────────────────────
+  editItemsDialogVisible = false;
 
   ngOnInit(): void {
     const code = this.route.snapshot.paramMap.get('code')!;
@@ -273,6 +281,19 @@ export class DetailServiceOrder implements OnInit {
 
   return(): void {
     this.router.navigate(['/os']);
+  }
+
+  // ── Ações: Itens ──────────────────────────────────────────────────────
+
+  openEditItemsDialog(): void {
+    this.editItemsDialogVisible = true;
+  }
+
+  onItemsSaved(result: EditItemsResult): void {
+    // Recarrega a OS completa para obter nomes dos produtos, KPIs etc.
+    if (this.order) {
+      this.reload();
+    }
   }
 
   // ── Ações: Endereço ───────────────────────────────────────────────────

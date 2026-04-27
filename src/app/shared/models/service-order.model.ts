@@ -14,6 +14,20 @@ export interface UpdateAddress {
   city: string | null;
 }
 
+export interface UpdateServiceOrderItem {
+  id?: string | null;
+  productId: string | null;
+  quantity: number | null;
+  amount: number | null;
+  details: string | null;
+}
+
+export interface UpdateItems {
+  items: UpdateServiceOrderItem[];
+  observation: string | null;
+  totalAmount: number;
+}
+
 export interface CreateServiceOrderItem {
   productId: string | null;
   quantity: number | null;

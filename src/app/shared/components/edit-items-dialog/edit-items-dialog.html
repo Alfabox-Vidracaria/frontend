@@ -1,0 +1,135 @@
+<p-dialog
+  header="Editar Itens"
+  [modal]="true"
+  [(visible)]="visible"
+  (visibleChange)="visibleChange.emit($event)"
+  [style]="{ width: '80rem' }"
+  [draggable]="false"
+  [resizable]="false"
+  [focusOnShow]="false"
+>
+  <form [formGroup]="form" class="dialog-form">
+
+
+    <!-- Cabeçalho da seção de itens: título + botão cadastrar produto -->
+    <div class="items-section-header">
+      <span class="items-label">Itens</span>
+      <p-button
+        label="Cadastrar Produto"
+        size="small"
+        severity="secondary"
+        icon="pi pi-plus"
+        (click)="openCreateProductDialog()"
+      />
+    </div>
+
+    <!-- Componente de itens -->
+    <app-os-items-input
+      [formControl]="$any(form.controls.items)"
+      scrollHeight="284px"
+    />
+
+    <p-divider></p-divider>
+
+    <!-- Linha: Observação (75%) + Valor Total (25%) -->
+    <div class="bottom-row">
+      <div class="form-field field-observation">
+        <p-floatlabel variant="on" class="full-width-control">
+          <textarea
+            pTextarea
+            id="ei_observation"
+            [formControl]="$any(form.controls.observation)"
+            [autoResize]="false"
+            [rows]="3"
+            maxlength="500"
+            class="observation-textarea"
+          ></textarea>
+          <label for="ei_observation">Observação</label>
+        </p-floatlabel>
+        <app-error-message [control]="form.get('observation')" />
+      </div>
+
+      <div class="form-field field-total">
+        <p-floatlabel variant="on" class="full-width-control">
+          <p-inputnumber
+            inputId="ei_total"
+            [formControl]="$any(form.controls.totalAmount)"
+            mode="currency"
+            currency="BRL"
+            locale="pt-BR"
+            [fluid]="true"
+            [invalid]="isInvalid('totalAmount')"
+          />
+          <label for="ei_total">Valor Total *</label>
+        </p-floatlabel>
+        <app-error-message [control]="form.get('totalAmount')" />
+      </div>
+    </div>
+
+  </form>
+
+  <ng-template #footer>
+    <div class="dialog-footer">
+      <p-button
+        label="Cancelar"
+        icon="pi pi-times"
+        severity="secondary"
+        [outlined]="true"
+        (click)="close()"
+      />
+      <p-button
+        label="Salvar"
+        icon="pi pi-save"
+        [loading]="saving"
+        [disabled]="form.invalid"
+        (click)="save()"
+      />
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- ═══ Dialog Cadastrar Produto ═══ -->
+<p-dialog
+  header="Cadastrar Produto"
+  [modal]="true"
+  [(visible)]="productDialogVisible"
+  [style]="{ width: '28rem' }"
+  [draggable]="false"
+  [resizable]="false"
+  [focusOnShow]="false"
+>
+  <form [formGroup]="productForm" class="dialog-form">
+    <div class="form-field">
+      <p-floatlabel variant="on" class="full-width-control">
+        <input
+          pInputText
+          fluid
+          id="ei_product_name"
+          formControlName="name"
+          [invalid]="isProductDialogInvalid('name')"
+        />
+        <label for="ei_product_name">Nome do Produto</label>
+      </p-floatlabel>
+      <app-error-message [control]="productForm.get('name')" />
+    </div>
+  </form>
+
+  <ng-template #footer>
+    <div class="dialog-footer">
+      <p-button
+        label="Cancelar"
+        icon="pi pi-times"
+        severity="secondary"
+        [outlined]="true"
+        (click)="productDialogVisible = false"
+      />
+      <p-button
+        label="Salvar"
+        icon="pi pi-save"
+        [disabled]="productForm.invalid"
+        [loading]="productDialogSaving"
+        (click)="saveProduct()"
+      />
+    </div>
+  </ng-template>
+</p-dialog>
