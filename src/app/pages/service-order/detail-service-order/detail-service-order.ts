@@ -1,5 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
+import { Location } from '@angular/common';
 import { SHARED_CRUD_IMPORTS } from '../../../shared/constants/shared-crud-imports';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ProgressBarModule } from 'primeng/progressbar';
@@ -58,6 +59,7 @@ import { CnpjFormatPipe } from '../../../shared/pipes/cnpj-format.pipe';
 })
 export class DetailServiceOrder implements OnInit {
   private readonly router = inject(Router);
+  private readonly location = inject(Location);
   private readonly route = inject(ActivatedRoute);
   private readonly serviceOrderService = inject(ServiceOrderService);
   private readonly messageService = inject(MessageService);
@@ -293,7 +295,11 @@ export class DetailServiceOrder implements OnInit {
   }
 
   return(): void {
-    this.router.navigate(['/os']);
+    if (window.history.length > 1) {
+      this.location.back();
+    } else {
+      this.router.navigate(['/os']);
+    }
   }
 
   printOrder(): void {
