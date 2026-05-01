@@ -2,7 +2,7 @@
 
   <!-- ═══ Título ═══ -->
   <div class="title">
-    <h1><span>|</span> Execuções por Montador</h1>
+    <h1><span>|</span> Ordens de Serviço por Vendedor</h1>
   </div>
 
   <!-- ═══ Card Principal ═══ -->
@@ -64,13 +64,13 @@
         <!-- Separador visual -->
         <div class="toolbar-separator"></div>
 
-        <!-- Seletor de montador -->
+        <!-- Seletor de vendedor -->
         <p-floatlabel variant="on">
           <p-select
-            inputId="assembler_select"
-            [(ngModel)]="selectedAssemblerId"
-            (ngModelChange)="onAssemblerChange()"
-            [options]="assemblers"
+            inputId="seller_select"
+            [(ngModel)]="selectedSellerId"
+            (ngModelChange)="onSellerChange()"
+            [options]="sellers"
             optionLabel="name"
             optionValue="id"
             [showClear]="true"
@@ -78,47 +78,31 @@
             appendTo="body"
             [style]="{ 'min-width': '20rem' }"
           />
-          <label for="assembler_select">Montador</label>
+          <label for="seller_select">Vendedor</label>
         </p-floatlabel>
 
       </div>
     </div>
 
-    <!-- ── KPIs ── -->
-    <div class="kpi-grid" [class.kpi-grid--single]="!selectedAssemblerId">
-
-      <!-- Total Período -->
-      <div class="kpi-card kpi-card--periodo">
+    <!-- ── KPI ── -->
+    <div class="kpi-grid">
+      <div class="kpi-card" [class.kpi-card--vendedor]="selectedSellerId" [class.kpi-card--periodo]="!selectedSellerId">
         <div class="kpi-body">
           <div class="kpi-left">
-            <i class="pi pi-calendar kpi-icon"></i>
+            <i class="kpi-icon" [class.pi]="true" [class.pi-calendar]="!selectedSellerId" [class.pi-user]="!!selectedSellerId"></i>
             <div class="kpi-info">
-              <span class="kpi-label">Total das Execuções no Período</span>
-              @if (selectedAssemblerId) {
-                <span class="kpi-sublabel">Soma de todas as execuções filtradas</span>
-              }
+              <span class="kpi-label">
+                @if (selectedSellerId) {
+                  Total vendido pelo vendedor selecionado
+                } @else {
+                  Total vendido no período
+                }
+              </span>
             </div>
           </div>
-          <span class="kpi-value">{{ (report?.totalPeriodAmount ?? 0) | currency:'BRL' }}</span>
+          <span class="kpi-value">{{ (report?.totalAmount ?? 0) | currency:'BRL' }}</span>
         </div>
       </div>
-
-      <!-- Total Montador (só exibe se montador selecionado) -->
-      @if (selectedAssemblerId) {
-        <div class="kpi-card kpi-card--montador">
-          <div class="kpi-body">
-            <div class="kpi-left">
-              <i class="pi pi-user kpi-icon"></i>
-              <div class="kpi-info">
-                <span class="kpi-label">Total do Montador Selecionado</span>
-                <span class="kpi-sublabel">Soma da parte proporcional nas execuções</span>
-              </div>
-            </div>
-            <span class="kpi-value">{{ (report?.totalAssemblerAmount ?? 0) | currency:'BRL' }}</span>
-          </div>
-        </div>
-      }
-
     </div>
 
     <!-- ── Tabela ── -->
@@ -127,7 +111,7 @@
       [size]="'large'"
       [scrollable]="true"
       scrollHeight="calc(100vh - 25rem)"
-      [value]="executions"
+      [value]="orders"
       [loading]="loading"
       [tableStyle]="{ 'min-width': '55rem', 'table-layout': 'fixed' }"
       dataKey="id"
@@ -136,20 +120,17 @@
       <!-- Cabeçalho -->
       <ng-template #header>
         <tr>
-          <th pSortableColumn="executionDate" style="width: 9rem">
-            <div class="column-header">Data <p-sortIcon field="executionDate" /></div>
+          <th pSortableColumn="orderDate" style="width: 9rem">
+            <div class="column-header">Data <p-sortIcon field="orderDate" /></div>
           </th>
           <th pSortableColumn="totalAmount" style="width: 12rem">
             <div class="column-header">Valor Total <p-sortIcon field="totalAmount" /></div>
           </th>
-          <th pSortableColumn="splitAmount" style="width: 14rem">
-            <div class="column-header">Valor por Montador <p-sortIcon field="splitAmount" /></div>
-          </th>
-          <th style="width: 6rem; text-align: center">
-            <div class="column-header" style="justify-content: center">Qtd.</div>
+          <th pSortableColumn="clientName" style="width: auto">
+            <div class="column-header">Cliente <p-sortIcon field="clientName" /></div>
           </th>
           <th style="width: auto">
-            <div class="column-header">Montadores</div>
+            <div class="column-header">Vendedor</div>
           </th>
           <th style="width: 9rem">
             <div class="column-header">Código OS</div>
@@ -160,14 +141,13 @@
       <!-- Corpo -->
       <ng-template #body let-item>
         <tr>
-          <td>{{ item.executionDate | date:'dd/MM/yyyy' }}</td>
+          <td>{{ item.orderDate | date:'dd/MM/yyyy' }}</td>
           <td>{{ item.totalAmount | currency:'BRL' }}</td>
-          <td>{{ item.splitAmount | currency:'BRL' }}</td>
-          <td style="text-align: center">{{ item.assemblerCount }}</td>
-          <td>{{ item.assemblers }}</td>
+          <td>{{ item.clientName }}</td>
+          <td>{{ item.sellerName }}</td>
           <td>
-            <span class="os-code-link" (click)="navigateToOrder(item.osCode)">
-              {{ item.osCode }}
+            <span class="os-code-link" (click)="navigateToOrder(item.code)">
+              {{ item.code }}
             </span>
           </td>
         </tr>
@@ -176,7 +156,7 @@
       <!-- Vazio -->
       <ng-template #emptymessage>
         <tr style="height: 60px;">
-          <td colspan="6" class="empty-message">Nenhuma execução encontrada para o período.</td>
+          <td colspan="5" class="empty-message">Nenhuma ordem de serviço encontrada para o período.</td>
         </tr>
       </ng-template>
 

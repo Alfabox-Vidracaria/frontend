@@ -68,6 +68,11 @@ export class Sidebar implements OnInit {
             icon: 'pi pi-fw pi-wrench',
             routerLink: '/relatorios/montadores',
           },
+          {
+            label: 'Vendedores',
+            icon: 'pi pi-fw pi-id-card',
+            routerLink: '/relatorios/vendedores',
+          },
         ],
       },
     ];

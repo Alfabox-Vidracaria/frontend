@@ -42,4 +42,36 @@ export class ReportsService {
 
     return this.http.get<ExecutionsReportResponse>(`${this.baseUrl}/executions`, { params });
   }
+
+  getOrdersReport(filters: OrdersReportFilter): Observable<OrdersReportResponse> {
+    let params = new HttpParams()
+      .set('startDate', filters.startDate)
+      .set('endDate', filters.endDate);
+
+    if (filters.sellerId) {
+      params = params.set('sellerId', filters.sellerId);
+    }
+
+    return this.http.get<OrdersReportResponse>(`${this.baseUrl}/orders`, { params });
+  }
+}
+
+export interface OrderReportItem {
+  id: string;
+  code: string;
+  orderDate: string;
+  clientName: string;
+  sellerName: string;
+  totalAmount: number;
+}
+
+export interface OrdersReportResponse {
+  totalAmount: number;
+  orders: OrderReportItem[];
+}
+
+export interface OrdersReportFilter {
+  startDate: string;
+  endDate: string;
+  sellerId?: string;
 }
