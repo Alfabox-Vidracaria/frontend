@@ -155,6 +155,17 @@ export interface ServiceOrderDetailEvent {
   createdAt: string;
 }
 
+export type MaintenanceExecutionStatus = 'PENDENTE' | 'CONCLUIDO';
+
+export interface ServiceOrderDetailMaintenance {
+  id: string;
+  code: string;
+  maintenanceDate: string; // YYYY-MM-DD
+  type: 'NORMAL' | 'WARRANTY';
+  totalAmount: number | null;
+  executionStatus: MaintenanceExecutionStatus;
+}
+
 export interface ServiceOrderDetail {
   id: string;
   code: string;
@@ -174,6 +185,7 @@ export interface ServiceOrderDetail {
   payments: ServiceOrderDetailPayment[];
   executions: ServiceOrderDetailExecution[];
   events: ServiceOrderDetailEvent[];
+  maintenances: ServiceOrderDetailMaintenance[];
   paidAmount: number;
   executedAmount: number;
   paymentStatus: PaymentStatus;

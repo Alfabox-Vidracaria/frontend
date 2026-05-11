@@ -486,7 +486,7 @@
           <!-- ── Card de Ocorrências ── -->
           <div class="events card">
             <div class="card-header">
-              <h3><span><i class="pi pi-list"></i></span> Ocorrências</h3>
+              <h3><span><i class="pi pi-megaphone"></i></span> Ocorrências</h3>
               <p-button
                 label="Registrar Ocorrência"
                 icon="pi pi-plus"
@@ -519,6 +519,54 @@
                 </tr>
               </ng-template>
             </p-table>
+            }
+          </div>
+
+          <!-- ── Card de Manutenções ── -->
+          <div class="maintenances card">
+            <div class="card-header">
+              <h3><span><i class="pi pi-hammer"></i></span> Manutenções</h3>
+              <p-button
+                label="Registrar Manutenção"
+                icon="pi pi-plus"
+                size="small"
+              />
+            </div>
+
+            @if (order.maintenances.length > 0) {
+              <p-table
+                [value]="order.maintenances"
+                [tableStyle]="{ 'width': '100%' }"
+              >
+                <ng-template #header>
+                  <tr>
+                    <th>Data</th>
+                    <th>Tipo</th>
+                    <th>Valor Total</th>
+                    <th>Execução</th>
+                    <th>Código</th>
+                  </tr>
+                </ng-template>
+                <ng-template #body let-m>
+                  <tr>
+                    <td>{{ toDate(m.maintenanceDate) | date:'dd/MM/yyyy' }}</td>
+                    <td>
+                      <p-tag
+                        [value]="m.type === 'NORMAL' ? 'PADRÃO' : 'GARANTIA'"
+                        [severity]="m.type === 'NORMAL' ? undefined : 'info'"
+                      />
+                    </td>
+                    <td>{{ m.totalAmount !== null ? (m.totalAmount | currency:'BRL') : '' }}</td>
+                    <td>
+                      <p-tag
+                        [value]="m.executionStatus === 'CONCLUIDO' ? 'CONCLUÍDO' : 'PENDENTE'"
+                        [severity]="m.executionStatus === 'CONCLUIDO' ? 'success' : 'warn'"
+                      />
+                    </td>
+                    <td class="col-code-mono">{{ m.code }}</td>
+                  </tr>
+                </ng-template>
+              </p-table>
             }
           </div>
 

@@ -441,6 +441,12 @@ h1, h2, h3 {
   max-width: 20rem;
 }
 
+.col-code-mono {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9rem;
+  letter-spacing: 0.03em;
+}
+
 .event-form {
   display: flex;
   flex-direction: column;

@@ -249,7 +249,14 @@ export class DetailServiceOrder implements OnInit {
       rejectButtonProps: { severity: 'secondary', outlined: true },
       accept: () => {
         this.paymentService.delete(this.order!.id, p.id).subscribe({
-          next: () => this.reload(),
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Sucesso',
+              detail: 'Pagamento excluído com sucesso!',
+            });
+            this.reload();
+          },
         });
       },
     });
@@ -288,7 +295,14 @@ export class DetailServiceOrder implements OnInit {
       rejectButtonProps: { severity: 'secondary', outlined: true },
       accept: () => {
         this.executionService.delete(this.order!.id, e.id).subscribe({
-          next: () => this.reload(),
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Sucesso',
+              detail: 'Execução excluída com sucesso!',
+            });
+            this.reload();
+          },
         });
       },
     });
@@ -413,7 +427,14 @@ export class DetailServiceOrder implements OnInit {
       rejectButtonProps: { severity: 'secondary', outlined: true },
       accept: () => {
         this.eventService.delete(this.order!.id, e.id).subscribe({
-          next: () => this.reload(),
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Sucesso',
+              detail: 'Ocorrência excluída com sucesso!',
+            });
+            this.reload();
+          },
         });
       },
     });
