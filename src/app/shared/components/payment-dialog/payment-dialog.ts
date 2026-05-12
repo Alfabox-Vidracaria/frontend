@@ -4,6 +4,7 @@ import { MessageService } from 'primeng/api';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { SHARED_CRUD_IMPORTS } from '../../constants/shared-crud-imports';
 import { ServiceOrderPaymentService } from '../../services/service-order-payment.service';
+import { MaintenanceService } from '../../services/maintenance.service';
 import {
   ServiceOrderPayment,
   PaymentMethod,
@@ -12,6 +13,8 @@ import {
 } from '../../models/service-order-payment.model';
 import { todayLocal, toApiDate, fromApiDate } from '../../utils/date.utils';
 import { toCents, fromCents } from '../../utils/money.utils';
+
+export type PaymentEntityType = 'service-order' | 'maintenance';
 
 export type PaymentDialogMode = 'create' | 'edit';
 
@@ -24,6 +27,7 @@ export type PaymentDialogMode = 'create' | 'edit';
 export class PaymentDialogComponent implements OnChanges {
   private readonly fb = inject(FormBuilder);
   private readonly paymentService = inject(ServiceOrderPaymentService);
+  private readonly maintenanceService = inject(MaintenanceService);
   private readonly messageService = inject(MessageService);
 
   // ── Inputs/Outputs ────────────────────────────────────────────────────
@@ -38,6 +42,8 @@ export class PaymentDialogComponent implements OnChanges {
   /** Código da OS para exibição no card de contexto. */
   @Input() orderCode!: string;
 
+  /** Define se o pagamento pertence a uma OS ou a uma Manutenção. Padrão: 'service-order'. */
+  @Input() entityType: PaymentEntityType = 'service-order';
   /** Nome do cliente da OS para exibição no card de contexto. */
   @Input() clientName!: string;
 
@@ -171,7 +177,11 @@ export class PaymentDialogComponent implements OnChanges {
         method: raw.method!,
         installments: this.isCredit ? raw.installments : null,
       };
-      this.paymentService.create(this.orderId, payload).subscribe({
+      const call$ =
+        this.entityType === 'maintenance'
+          ? this.maintenanceService.createPayment(this.orderId, payload)
+          : this.paymentService.create(this.orderId, payload);
+      call$.subscribe({
         next: () => this.onSuccess('Pagamento lançado com sucesso!'),
         error: () => {
           this.saving = false;
@@ -184,7 +194,11 @@ export class PaymentDialogComponent implements OnChanges {
         method: raw.method!,
         installments: this.isCredit ? raw.installments : null,
       };
-      this.paymentService.update(this.orderId, this.payment!.id, payload).subscribe({
+      const call$ =
+        this.entityType === 'maintenance'
+          ? this.maintenanceService.updatePayment(this.orderId, this.payment!.id, payload)
+          : this.paymentService.update(this.orderId, this.payment!.id, payload);
+      call$.subscribe({
         next: () => this.onSuccess('Pagamento atualizado com sucesso!'),
         error: () => {
           this.saving = false;

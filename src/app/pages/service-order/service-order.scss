@@ -139,6 +139,12 @@ h1, h2, h3 {
 
 // ── Tabela ────────────────────────────────────────────────────────────
 
+// Separa visualmente o header do conteúdo, e dá um respiro entre a borda superior da tabela e a primeira linha
+p-table {
+  border-top: 1px solid var(--p-surface-200);
+  padding-top: 0.75rem;
+}
+
 // Força todos os inputs/selects/datepickers dentro dos th de filtro
 // a respeitarem os limites da célula (essencial com table-layout: fixed)
 :host ::ng-deep {

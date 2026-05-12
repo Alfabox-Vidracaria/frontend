@@ -16,6 +16,7 @@ import { Router } from '@angular/router';
 import { PaymentDialogComponent } from '../../shared/components/payment-dialog/payment-dialog';
 import { ExecutionDialogComponent } from '../../shared/components/execution-dialog/execution-dialog';
 import { ServiceOrderFilterStateService } from '../../shared/services/service-order-filter-state.service';
+import { AuthService } from '../../shared/services/auth.service';
 
 /** Linha da tabela — datas convertidas para Date para os filtros locais do PrimeNG. */
 export interface ServiceOrderRow extends Omit<
@@ -45,6 +46,7 @@ export class ServiceOrder implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly serviceOrderService = inject(ServiceOrderService);
   private readonly filterState = inject(ServiceOrderFilterStateService);
+  readonly authService = inject(AuthService);
 
   // ── Estado ────────────────────────────────────────────────────────────
 
@@ -311,6 +313,10 @@ export class ServiceOrder implements OnInit, OnDestroy {
   get receivablePercentage(): number {
     if (!this.totalVendido) return 0;
     return Math.min(100, Math.round((this.totalAReceber / this.totalVendido) * 100));
+  }
+
+  get tableScrollHeight(): string {
+    return this.authService.isAdmin() ? 'calc(100vh - 26rem)' : 'calc(100vh - 19.5rem)';
   }
 
   // ── Helpers de display ────────────────────────────────────────────────

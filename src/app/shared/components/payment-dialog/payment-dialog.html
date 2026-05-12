@@ -14,7 +14,7 @@
     <!-- Seção: Contexto da OS -->
     <div class="os-context card">
       <div class="info-item">
-        <span class="info-label">Ordem de Serviço</span>
+        <span class="info-label">{{ entityType === 'maintenance' ? 'Manutenção' : 'Ordem de Serviço' }}</span>
         <p-tag [value]="orderCode" severity="secondary" />
       </div>
       <div class="info-item">

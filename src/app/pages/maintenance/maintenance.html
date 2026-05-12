@@ -207,7 +207,7 @@
       stripedRows
       [size]="'small'"
       [scrollable]="true"
-      scrollHeight="calc(100vh - 22rem)"
+      [scrollHeight]="tableScrollHeight"
       [value]="maintenances"
       [loading]="loading"
       [tableStyle]="{ 'min-width': '60rem', 'table-layout': 'fixed' }"
@@ -368,7 +368,11 @@
           <td class="assemblers-cell">{{ m.assemblerNames || '—' }}</td>
           <td class="actions">
             <p-button icon="pi pi-eye" [rounded]="true" [text]="true" severity="info" pTooltip="Visualizar" tooltipPosition="top" [disabled]="true" />
-            <p-button *hasRole="'ADMIN'" icon="pi pi-dollar" [rounded]="true" [text]="true" severity="success" pTooltip="Lançar Pagamento" tooltipPosition="top" [disabled]="true" />
+            @if (m.type !== 'WARRANTY') {
+              <p-button *hasRole="'ADMIN'" icon="pi pi-dollar" [rounded]="true" [text]="true" severity="success" pTooltip="Lançar Pagamento" tooltipPosition="top"
+                [disabled]="m.type === 'WARRANTY' || m.paymentStatus === 'PAGO'"
+                (onClick)="openPaymentDialog(m)" />
+            }
             <p-button *hasRole="'ADMIN'" icon="pi pi-wrench" [rounded]="true" [text]="true" severity="warn" pTooltip="Registrar Execução" tooltipPosition="top" [disabled]="true" />
             <p-button icon="pi pi-print" [rounded]="true" [text]="true" severity="secondary" pTooltip="Imprimir" tooltipPosition="top" [disabled]="true" />
           </td>
@@ -386,3 +390,14 @@
 
   </div>
 </div>
+
+<app-payment-dialog
+  [(visible)]="paymentDialogVisible"
+  [orderId]="paymentDialogMaintenanceId"
+  [orderCode]="paymentDialogCode"
+  [clientName]="paymentDialogClientName"
+  [orderTotal]="paymentDialogTotal"
+  [paidAmount]="paymentDialogPaidAmount"
+  [entityType]="'maintenance'"
+  (saved)="onPaymentSaved()"
+/>

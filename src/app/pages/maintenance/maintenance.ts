@@ -12,9 +12,11 @@ import {
   MaintenanceType,
 } from '../../shared/services/maintenance.service';
 import { MaintenanceFilterStateService } from '../../shared/services/maintenance-filter-state.service';
+import { AuthService } from '../../shared/services/auth.service';
 import { fromApiDate, toApiDate } from '../../shared/utils/date.utils';
 import { sumField, subtractCurrency, fromCents, toCents } from '../../shared/utils/money.utils';
 import { Router } from '@angular/router';
+import { PaymentDialogComponent } from '../../shared/components/payment-dialog/payment-dialog';
 
 /** Linha da tabela — maintenanceDate convertido para Date para filtros locais do PrimeNG.
  *  totalAmount e paymentStatus são null para manutenções de GARANTIA (não exibidos na tabela). */
@@ -38,6 +40,7 @@ export interface MaintenanceRow extends Omit<
     ProgressBarModule,
     IconFieldModule,
     InputIconModule,
+    PaymentDialogComponent,
   ],
   templateUrl: './maintenance.html',
   styleUrl: './maintenance.scss',
@@ -46,6 +49,7 @@ export class Maintenance implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly maintenanceService = inject(MaintenanceService);
   private readonly filterState = inject(MaintenanceFilterStateService);
+  readonly authService = inject(AuthService);
 
   // ── Estado ────────────────────────────────────────────────────────────
 
@@ -268,6 +272,38 @@ export class Maintenance implements OnInit, OnDestroy {
   get aReceberPercentage(): number {
     if (!this.totalManutencoes) return 0;
     return Math.min(100, Math.round((this.totalAReceber / this.totalManutencoes) * 100));
+  }
+
+  get tableScrollHeight(): string {
+    return this.authService.isAdmin() ? 'calc(100vh - 31rem)' : 'calc(100vh - 19.5rem)';
+  }
+
+  // ── Helpers de display ────────────────────────────────────────────────
+
+  paymentDialogVisible = false;
+  paymentDialogMaintenanceId = '';
+  paymentDialogCode = '';
+  paymentDialogClientName = '';
+  paymentDialogTotal = 0;
+  paymentDialogPaidAmount = 0;
+
+  openPaymentDialog(m: MaintenanceRow): void {
+    this.paymentDialogMaintenanceId = m.id;
+    this.paymentDialogCode = m.code;
+    this.paymentDialogClientName = m.clientName;
+    this.paymentDialogTotal = m.totalAmount ?? 0;
+    this.paymentDialogPaidAmount = m.paidAmount;
+    this.paymentDialogVisible = true;
+  }
+
+  onPaymentSaved(): void {
+    const filters =
+      this.searchMode && this.searchText.trim()
+        ? { search: this.searchText.trim() }
+        : this.startDate && this.endDate
+          ? { startDate: toApiDate(this.startDate), endDate: toApiDate(this.endDate) }
+          : {};
+    this.load(filters);
   }
 
   // ── Helpers de display ────────────────────────────────────────────────

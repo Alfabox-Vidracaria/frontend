@@ -179,7 +179,7 @@
       stripedRows
       [size]="'small'"
       [scrollable]="true"
-      scrollHeight="calc(100vh - 26rem)"
+      [scrollHeight]="tableScrollHeight"
       [value]="orders"
       [loading]="loading"
       [tableStyle]="{ 'min-width': '60rem', 'table-layout': 'fixed' }"

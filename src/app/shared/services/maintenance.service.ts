@@ -66,4 +66,20 @@ export class MaintenanceService {
   create(payload: CreateMaintenancePayload): Observable<MaintenanceResponse> {
     return this.http.post<MaintenanceResponse>(this.baseUrl, payload);
   }
+
+  createPayment(maintenanceId: string, payload: object): Observable<unknown> {
+    return this.http.post(`${this.baseUrl}/${maintenanceId}/payments`, payload);
+  }
+
+  updatePayment(maintenanceId: string, paymentId: string, payload: object): Observable<unknown> {
+    return this.http.patch(`${this.baseUrl}/${maintenanceId}/payments/${paymentId}`, payload);
+  }
+
+  deletePayment(maintenanceId: string, paymentId: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${maintenanceId}/payments/${paymentId}`);
+  }
+
+  getPayments(maintenanceId: string): Observable<unknown[]> {
+    return this.http.get<unknown[]>(`${this.baseUrl}/${maintenanceId}/payments`);
+  }
 }
