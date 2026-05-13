@@ -1,0 +1,399 @@
+<div class="page">
+  <div class="header">
+    <h1><span>|</span> Manutenção</h1>
+    <p-button label="Voltar" icon="pi pi-arrow-left" [outlined]="true" (click)="return()"></p-button>
+  </div>
+
+  @if (!loading && maintenance) {
+
+  <!-- ═══ Toolbar ═══ -->
+  <div class="card toolbar">
+    <div class="info">
+      <div>
+        <span>Código</span>
+        <h2>{{ maintenance.code }}</h2>
+      </div>
+      <div>
+        <span>Tipo</span>
+        <p-tag
+          [value]="getTypeLabel(maintenance.type)"
+          [severity]="getTypeSeverity(maintenance.type)"
+        />
+      </div>
+      @if (maintenance.type !== 'WARRANTY') {
+        <div>
+          <span>Pagamento</span>
+          <p-tag
+            [value]="maintenance.paymentStatus"
+            [severity]="getPaymentStatusSeverity(maintenance.paymentStatus)"
+          />
+        </div>
+      }
+      <div>
+        <span>Execução</span>
+        <p-tag
+          [value]="getExecutionStatusLabel(maintenance.executionStatus)"
+          [severity]="getExecutionStatusSeverity(maintenance.executionStatus)"
+        />
+      </div>
+    </div>
+    <div class="actions">
+      <p-button label="Imprimir" outlined="true" icon="pi pi-print"></p-button>
+      <p-button *hasRole="'ADMIN'" label="Excluir" severity="danger" icon="pi pi-trash"></p-button>
+    </div>
+  </div>
+
+  <!-- ═══ Conteúdo ═══ -->
+  <div class="content">
+
+    <!-- ── Coluna esquerda: dados da manutenção ── -->
+    <div class="details card">
+
+      <!-- Data + Código OS -->
+      <div class="detail-row">
+        <div class="detail-field">
+          <span class="field-label">Data</span>
+          <span class="field-value">{{ toDate(maintenance.maintenanceDate) | date:'dd/MM/yyyy' }}</span>
+        </div>
+        <div class="detail-field">
+          <span class="field-label">OS de Origem</span>
+          @if (maintenance.serviceOrderCode) {
+            <a
+              class="field-value field-value--link-mono"
+              (click)="navigateToServiceOrder(maintenance.serviceOrderCode)"
+              pTooltip="Ver Ordem de Serviço" tooltipPosition="top"
+            >{{ maintenance.serviceOrderCode }}</a>
+          } @else {
+            <span class="field-value field-value--muted">—</span>
+          }
+        </div>
+      </div>
+
+      <p-divider />
+
+      <!-- Cliente -->
+      <div class="section-title-row">
+        <p class="section-title">Cliente</p>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-field detail-field--grow">
+          <span class="field-label">Nome</span>
+          <span class="field-value">{{ maintenance.client.name }}</span>
+        </div>
+        <div class="detail-field">
+          <span class="field-label">Tipo</span>
+          <span class="field-value">{{ formatPersonType() }}</span>
+        </div>
+        <div class="detail-field">
+          <span class="field-label">{{ documentLabel }}</span>
+          <span class="field-value">{{ formatDocument() }}</span>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-field detail-field--phones">
+          <span class="field-label">Telefones</span>
+          <div class="phones-list">
+            @for (phone of maintenance.client.phones; track phone.id) {
+              <span class="phone-item">
+                <span class="field-value">{{ phone.number | phoneFormat }}</span>
+                <a
+                  [href]="whatsappUrl(phone.number)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="whatsapp-btn"
+                  pTooltip="Abrir no WhatsApp"
+                  tooltipPosition="top"
+                >
+                  <i class="pi pi-whatsapp"></i>
+                </a>
+              </span>
+            }
+            @if (maintenance.client.phones.length === 0) {
+              <span class="field-value field-value--muted">—</span>
+            }
+          </div>
+        </div>
+      </div>
+
+      <p-divider />
+
+      <!-- Endereço -->
+      <div class="section-title-row">
+        <p class="section-title">Endereço</p>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-field detail-field--addr-street">
+          <span class="field-label">Rua</span>
+          <span class="field-value">{{ maintenance.address.street || '—' }}</span>
+        </div>
+        <div class="detail-field detail-field--addr-number">
+          <span class="field-label">Número</span>
+          <span class="field-value">{{ maintenance.address.addressNumber || '—' }}</span>
+        </div>
+        <div class="detail-field detail-field--addr-complement">
+          <span class="field-label">Complemento</span>
+          <span class="field-value">{{ maintenance.address.complement || '—' }}</span>
+        </div>
+        <div class="detail-field detail-field--addr-neighborhood">
+          <span class="field-label">Bairro</span>
+          <span class="field-value">{{ maintenance.address.neighborhood || '—' }}</span>
+        </div>
+        <div class="detail-field detail-field--addr-city">
+          <span class="field-label">Cidade</span>
+          <span class="field-value">{{ maintenance.address.city || '—' }}</span>
+        </div>
+      </div>
+
+      <p-divider />
+
+      <!-- Produto -->
+      <div class="section-title-row">
+        <p class="section-title">Produto</p>
+      </div>
+
+      @if (maintenance.productDescription) {
+        <div class="detail-row">
+          <div class="detail-field detail-field--grow">
+            <span class="field-label">Descrição</span>
+            <span class="field-value">{{ maintenance.productDescription }}</span>
+          </div>
+        @if (maintenance.type !== 'WARRANTY') {
+          <div class="detail-field detail-field--right">
+            <span class="field-label">Valor do Produto</span>
+            <span class="field-value field-value--amount">{{ maintenance.productAmount | currency:'BRL' }}</span>
+          </div>
+        }
+        </div>
+      }
+
+      <p-divider />
+
+      <!-- Observação + Mão de obra + Total -->
+      <div class="detail-row">
+        <div class="detail-field detail-field--grow">
+          <span class="field-label">Observação</span>
+          <span class="field-value field-value--muted">{{ maintenance.observation || '—' }}</span>
+        </div>
+        @if (maintenance.type !== 'WARRANTY') {
+          <div class="detail-field detail-field--right">
+            <span class="field-label">Mão de Obra</span>
+            <span class="field-value field-value--amount">{{ maintenance.laborAmount | currency:'BRL' }}</span>
+          </div>
+        }
+      </div>
+
+      @if (maintenance.type !== 'WARRANTY') {
+        <div class="detail-row detail-row--total-only">
+          <div class="detail-field detail-field--total">
+            <span class="field-label">Valor Total</span>
+            <span class="field-value field-value--total">{{ maintenance.totalAmount | currency:'BRL' }}</span>
+          </div>
+        </div>
+      }
+
+    </div>
+
+    <!-- ── Coluna direita: pagamentos / execução ── -->
+    <div class="payments-executions">
+
+      <!-- Card Pagamentos (apenas NORMAL) -->
+      @if (maintenance.type !== 'WARRANTY') {
+      <div class="payments card">
+        <div class="card-header">
+          <h3><span><i class="pi pi-dollar"></i></span> Pagamentos</h3>
+          @if (maintenance.paymentStatus !== 'PAGO') {
+            <p-button
+              *hasRole="'ADMIN'"
+              label="Lançar Pagamento"
+              icon="pi pi-plus"
+              size="small"
+              (click)="openCreatePaymentDialog()"
+            />
+          }
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card kpi-card--pago" [class.kpi-card--full]="maintenance.paymentStatus === 'PAGO'">
+            <div class="kpi-body">
+              <div class="kpi-left">
+                <i class="pi pi-check-circle kpi-icon"></i>
+                <span class="kpi-label">Total Pago</span>
+              </div>
+              <span class="kpi-value">{{ maintenance.paidAmount | currency:'BRL' }}</span>
+            </div>
+            <div class="kpi-progress">
+              <p-progressbar [value]="paidPercentage" [showValue]="false" styleClass="kpi-progressbar kpi-progressbar--success" />
+              <span class="kpi-progress-label">{{ paidPercentage }}% pago</span>
+            </div>
+          </div>
+          @if (maintenance.paymentStatus !== 'PAGO') {
+            <div class="kpi-card kpi-card--devedor">
+              <div class="kpi-body">
+                <div class="kpi-left">
+                  <i class="pi pi-clock kpi-icon"></i>
+                  <span class="kpi-label">Saldo Devedor</span>
+                </div>
+                <span class="kpi-value">{{ balance | currency:'BRL' }}</span>
+              </div>
+            </div>
+          }
+        </div>
+
+        @if (maintenance.payments.length > 0) {
+          <p-table [value]="maintenance.payments" [tableStyle]="{ 'width': '100%' }">
+            <ng-template #header>
+              <tr>
+                <th>Data</th>
+                <th>Valor</th>
+                <th>Método</th>
+                <th>Parcelas</th>
+                <th *hasRole="'ADMIN'" style="width: 6rem; text-align: center">Ações</th>
+              </tr>
+            </ng-template>
+            <ng-template #body let-p>
+              <tr>
+                <td>{{ toDate(p.paymentDate) | date:'dd/MM/yyyy' }}</td>
+                <td>{{ p.amount | currency:'BRL' }}</td>
+                <td>{{ formatPaymentMethod(p.method, null) }}</td>
+                <td>{{ p.installments ?? '' }}</td>
+                <td *hasRole="'ADMIN'" class="actions">
+                  <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="info" pTooltip="Editar" tooltipPosition="top" (click)="openEditPaymentDialog(p)" />
+                  <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" pTooltip="Excluir" tooltipPosition="top" (click)="confirmDeletePayment($event, p)" />
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template #emptymessage>
+              <tr>
+                <td colspan="5" class="empty-message">Nenhum pagamento registrado.</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        }
+      </div>
+      }
+
+      <!-- Card Distribuição Financeira (apenas NORMAL + ADMIN) -->
+      @if (maintenance.type !== 'WARRANTY') {
+        <div *hasRole="'ADMIN'" class="distribution card">
+          <div class="card-header">
+            <h3><span><i class="pi pi-chart-pie"></i></span> Distribuição Financeira</h3>
+          </div>
+
+          <div class="kpi-grid kpi-grid--distribution">
+
+            <!-- Total Vidraçaria -->
+            <div class="kpi-card kpi-card--vidracaria">
+              <div class="kpi-body">
+                <div class="kpi-left">
+                  <i class="pi pi-building kpi-icon"></i>
+                  <span class="kpi-label">Total Vidraçaria</span>
+                </div>
+                <span class="kpi-value">{{ maintenance.vidracariaAmount | currency:'BRL' }}</span>
+              </div>
+            </div>
+
+            <!-- Total Montadores -->
+            <div class="kpi-card kpi-card--montadores">
+              <div class="kpi-body">
+                <div class="kpi-left">
+                  <i class="pi pi-users kpi-icon"></i>
+                  <span class="kpi-label">Total Montadores</span>
+                </div>
+                <span class="kpi-value">{{ maintenance.assemblersTotalAmount | currency:'BRL' }}</span>
+              </div>
+            </div>
+
+            <!-- Valor por Montador (apenas se tiver montadores registrados) -->
+            @if (maintenance.assemblers.length > 0) {
+              <div class="kpi-card kpi-card--por-montador">
+                <div class="kpi-body">
+                  <div class="kpi-left">
+                    <i class="pi pi-user kpi-icon"></i>
+                    <span class="kpi-label">Valor por Montador</span>
+                  </div>
+                  <span class="kpi-value">{{ maintenance.amountPerAssembler | currency:'BRL' }}</span>
+                </div>
+              </div>
+            }
+
+          </div>
+        </div>
+      }
+
+      <!-- Card Execução -->
+      <div class="executions card">
+        <div class="card-header">
+          <h3><span><i class="pi pi-wrench"></i></span> Execução</h3>
+          @if (maintenance.executionStatus !== 'CONCLUIDO') {
+            <p-button
+              *hasRole="'ADMIN'"
+              label="Registrar Execução"
+              icon="pi pi-plus"
+              size="small"
+              (click)="openExecutionDialog()"
+            />
+          }
+        </div>
+
+        @if (maintenance.executionDate) {
+          <p-table [value]="[maintenance]" [tableStyle]="{ 'width': '100%' }">
+            <ng-template #header>
+              <tr>
+                <th>Data</th>
+                @if (maintenance.type !== 'WARRANTY') {
+                  <th>Valor / Montador</th>
+                }
+                <th>Montadores</th>
+                <th *hasRole="'ADMIN'" style="width: 5rem; text-align: center">Ação</th>
+              </tr>
+            </ng-template>
+            <ng-template #body let-m>
+              <tr>
+                <td>{{ toDate(m.executionDate) | date:'dd/MM/yyyy' }}</td>
+                @if (m.type !== 'WARRANTY') {
+                  <td>{{ m.amountPerAssembler | currency:'BRL' }}</td>
+                }
+                <td>{{ m.assemblers.length > 0 ? formatAssemblers(m.assemblers) : '—' }}</td>
+                <td *hasRole="'ADMIN'" class="actions">
+                  <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" pTooltip="Excluir execução" tooltipPosition="top" (click)="confirmDeleteExecution($event)" />
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        }
+      </div>
+
+    </div>
+  </div>
+
+  } <!-- end @if maintenance -->
+</div>
+
+<!-- ═══ Dialogs ═══ -->
+@if (maintenance) {
+  <app-payment-dialog
+    [(visible)]="paymentDialogVisible"
+    [orderId]="maintenance.id"
+    [orderCode]="maintenance.code"
+    [clientName]="maintenance.client.name"
+    [orderTotal]="maintenance.totalAmount"
+    [paidAmount]="maintenance.paidAmount"
+    [entityType]="'maintenance'"
+    [mode]="paymentDialogMode"
+    [payment]="paymentDialogPayment"
+    (saved)="reload()"
+  />
+
+  <app-maintenance-execution-dialog
+    [(visible)]="executionDialogVisible"
+    [maintenanceId]="maintenance.id"
+    [maintenanceCode]="maintenance.code"
+    [clientName]="maintenance.client.name"
+    [type]="maintenance.type"
+    [hasExecution]="maintenance.executionStatus === 'CONCLUIDO'"
+    (saved)="reload()"
+  />
+}

@@ -139,6 +139,10 @@ export class Maintenance implements OnInit, OnDestroy {
     this.router.navigate(['/manutencao/criar']);
   }
 
+  navigateToDetail(code: string): void {
+    this.router.navigate(['/manutencao', code]);
+  }
+
   // ── Carregamento ──────────────────────────────────────────────────────
 
   private loadCurrentMonth(): void {

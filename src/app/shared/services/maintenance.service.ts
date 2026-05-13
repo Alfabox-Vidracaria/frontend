@@ -46,6 +46,70 @@ export interface MaintenanceListItem {
   assemblerNames: string | null;
 }
 
+// ── Detalhe completo da Manutenção ───────────────────────────────────────
+
+export interface MaintenanceDetailPhone {
+  id: string;
+  number: string;
+}
+
+export interface MaintenanceDetailClient {
+  id: string;
+  name: string;
+  personType: string;
+  document: string | null;
+  isActive: boolean;
+  phones: MaintenanceDetailPhone[];
+}
+
+export interface MaintenanceDetailAddress {
+  street: string | null;
+  addressNumber: string | null;
+  neighborhood: string | null;
+  complement: string | null;
+  city: string | null;
+}
+
+export interface MaintenanceDetailAssembler {
+  id: string;
+  name: string;
+}
+
+export interface MaintenanceDetailPayment {
+  id: string;
+  amount: number;
+  paymentDate: string; // YYYY-MM-DD
+  method: string;
+  installments: number | null;
+  maintenanceId: string;
+}
+
+export interface MaintenanceDetail {
+  id: string;
+  code: string;
+  type: MaintenanceType;
+  serviceOrderCode: string | null;
+  client: MaintenanceDetailClient;
+  address: MaintenanceDetailAddress;
+  maintenanceDate: string; // YYYY-MM-DD
+  observation: string | null;
+  productDescription: string | null;
+  productAmount: number;
+  laborAmount: number;
+  totalAmount: number;
+  payments: MaintenanceDetailPayment[];
+  paidAmount: number;
+  paymentStatus: MaintenancePaymentStatus;
+  executionDate: string | null; // YYYY-MM-DD
+  assemblers: MaintenanceDetailAssembler[];
+  executionStatus: MaintenanceExecutionStatus;
+  vidracariaAmount: number;
+  assemblersTotalAmount: number;
+  amountPerAssembler: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class MaintenanceService {
   private readonly http = inject(HttpClient);
@@ -63,6 +127,10 @@ export class MaintenanceService {
     return this.http.get<MaintenanceListItem[]>(this.baseUrl, { params });
   }
 
+  findByCode(code: string): Observable<MaintenanceDetail> {
+    return this.http.get<MaintenanceDetail>(`${this.baseUrl}/${code}`);
+  }
+
   create(payload: CreateMaintenancePayload): Observable<MaintenanceResponse> {
     return this.http.post<MaintenanceResponse>(this.baseUrl, payload);
   }
@@ -72,6 +140,10 @@ export class MaintenanceService {
     payload: { executionDate: string; assemblerIds: string[] },
   ): Observable<unknown> {
     return this.http.patch(`${this.baseUrl}/${maintenanceId}/execution`, payload);
+  }
+
+  deleteExecution(maintenanceId: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${maintenanceId}/execution`);
   }
 
   createPayment(maintenanceId: string, payload: object): Observable<unknown> {

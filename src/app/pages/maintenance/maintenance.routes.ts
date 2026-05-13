@@ -10,4 +10,9 @@ export const MAINTENANCE_ROUTES: Routes = [
     loadComponent: () =>
       import('./create-maintenance/create-maintenance').then((m) => m.CreateMaintenance),
   },
+  {
+    path: ':code',
+    loadComponent: () =>
+      import('./detail-maintenance/detail-maintenance').then((m) => m.DetailMaintenance),
+  },
 ];
