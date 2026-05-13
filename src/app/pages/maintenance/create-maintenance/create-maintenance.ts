@@ -7,10 +7,8 @@ import { Subject, debounceTime, switchMap, of } from 'rxjs';
 import { Location, CurrencyPipe } from '@angular/common';
 import { ClientService } from '../../../shared/services/client.service';
 import { ServiceOrderService } from '../../../shared/services/service-order.service';
-import {
-  MaintenanceService,
-  CreateMaintenancePayload,
-} from '../../../shared/services/maintenance.service';
+import { MaintenanceService } from '../../../shared/services/maintenance.service';
+import { CreateMaintenance as CreateMaintenancePayload } from '../../../shared/models/maintenance.model';
 import { Client, ClientPhone } from '../../../shared/models/client.model';
 import {
   ServiceOrderAddress,

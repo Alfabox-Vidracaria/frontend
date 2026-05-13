@@ -7,23 +7,27 @@ import { ProgressBarModule } from 'primeng/progressbar';
 import { ConfirmationService, MessageService } from 'primeng/api';
 
 import { SHARED_CRUD_IMPORTS } from '../../../shared/constants/shared-crud-imports';
+import { MaintenanceService } from '../../../shared/services/maintenance.service';
+import { MaintenancePaymentService } from '../../../shared/services/maintenance-payment.service';
 import {
-  MaintenanceService,
   MaintenanceDetail,
   MaintenanceDetailPayment,
   MaintenanceType,
   MaintenancePaymentStatus,
   MaintenanceExecutionStatus,
-} from '../../../shared/services/maintenance.service';
+} from '../../../shared/models/maintenance.model';
+import { MaintenancePayment } from '../../../shared/models/maintenance-payment.model';
 import { PhoneFormatPipe } from '../../../shared/pipes/phone-format.pipe';
 import { CpfFormatPipe } from '../../../shared/pipes/cpf-format.pipe';
 import { CnpjFormatPipe } from '../../../shared/pipes/cnpj-format.pipe';
 import { fromApiDate } from '../../../shared/utils/date.utils';
 import { whatsappUrl } from '../../../shared/utils/whatsapp.utils';
 import { toCents, fromCents } from '../../../shared/utils/money.utils';
-import { ServiceOrderPayment } from '../../../shared/models/service-order-payment.model';
 import { PaymentDialogComponent } from '../../../shared/components/payment-dialog/payment-dialog';
 import { MaintenanceExecutionDialogComponent } from '../../../shared/components/maintenance-execution-dialog/maintenance-execution-dialog';
+import { ClientDialogComponent } from '../../../shared/components/client-dialog/client-dialog';
+import { Client } from '../../../shared/models/client.model';
+import { AddressDialogComponent } from '../../../shared/components/address-dialog/address-dialog';
 
 @Component({
   selector: 'app-detail-maintenance',
@@ -36,6 +40,8 @@ import { MaintenanceExecutionDialogComponent } from '../../../shared/components/
     PhoneFormatPipe,
     PaymentDialogComponent,
     MaintenanceExecutionDialogComponent,
+    ClientDialogComponent,
+    AddressDialogComponent,
   ],
   templateUrl: './detail-maintenance.html',
   styleUrl: './detail-maintenance.scss',
@@ -45,6 +51,7 @@ export class DetailMaintenance implements OnInit {
   private readonly location = inject(Location);
   private readonly route = inject(ActivatedRoute);
   private readonly maintenanceService = inject(MaintenanceService);
+  private readonly maintenancePaymentService = inject(MaintenancePaymentService);
   private readonly messageService = inject(MessageService);
   private readonly confirmationService = inject(ConfirmationService);
 
@@ -54,10 +61,16 @@ export class DetailMaintenance implements OnInit {
   // ── Dialog Pagamento ──────────────────────────────────────────────────
   paymentDialogVisible = false;
   paymentDialogMode: 'create' | 'edit' = 'create';
-  paymentDialogPayment: ServiceOrderPayment | null = null;
+  paymentDialogPayment: MaintenancePayment | null = null;
 
   // ── Dialog Execução ───────────────────────────────────────────────────
   executionDialogVisible = false;
+
+  // ── Dialog Cliente ────────────────────────────────────────────────────
+  clientDialogVisible = false;
+
+  // ── Dialog Endereço ───────────────────────────────────────────────────
+  addressDialogVisible = false;
 
   ngOnInit(): void {
     const code = this.route.snapshot.paramMap.get('code')!;
@@ -167,6 +180,55 @@ export class DetailMaintenance implements OnInit {
     this.router.navigate(['/os', code]);
   }
 
+  // ── Ações: Endereço ───────────────────────────────────────────────────
+
+  openEditAddressDialog(): void {
+    this.addressDialogVisible = true;
+  }
+
+  onAddressSaved(updated: {
+    street: string | null;
+    addressNumber: string | null;
+    neighborhood: string | null;
+    complement: string | null;
+    city: string | null;
+  }): void {
+    if (this.maintenance) {
+      this.maintenance = {
+        ...this.maintenance,
+        address: {
+          street: updated.street,
+          addressNumber: updated.addressNumber,
+          neighborhood: updated.neighborhood,
+          complement: updated.complement,
+          city: updated.city,
+        },
+      };
+    }
+  }
+
+  // ── Ações: Cliente ────────────────────────────────────────────────────
+
+  openEditClientDialog(): void {
+    this.clientDialogVisible = true;
+  }
+
+  onClientSaved(updated: Client): void {
+    if (this.maintenance) {
+      this.maintenance = {
+        ...this.maintenance,
+        client: {
+          ...this.maintenance.client,
+          name: updated.name,
+          personType: updated.personType,
+          document: updated.document ?? null,
+          isActive: updated.isActive,
+          phones: updated.phones.map((p) => ({ id: p.id, number: p.number })),
+        },
+      };
+    }
+  }
+
   // ── Ações: Pagamento ──────────────────────────────────────────────────
 
   formatPaymentMethod(method: string, installments: number | null): string {
@@ -195,8 +257,9 @@ export class DetailMaintenance implements OnInit {
       id: p.id,
       amount: p.amount,
       paymentDate: p.paymentDate,
-      method: p.method as ServiceOrderPayment['method'],
+      method: p.method as MaintenancePayment['method'],
       installments: p.installments,
+      maintenanceId: p.maintenanceId,
     };
     this.paymentDialogVisible = true;
   }
@@ -213,7 +276,7 @@ export class DetailMaintenance implements OnInit {
       acceptButtonProps: { severity: 'danger' },
       rejectButtonProps: { severity: 'secondary', outlined: true },
       accept: () => {
-        this.maintenanceService.deletePayment(this.maintenance!.id, p.id).subscribe({
+        this.maintenancePaymentService.delete(this.maintenance!.id, p.id).subscribe({
           next: () => {
             this.messageService.add({
               severity: 'success',

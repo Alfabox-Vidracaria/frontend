@@ -74,6 +74,16 @@
       <!-- Cliente -->
       <div class="section-title-row">
         <p class="section-title">Cliente</p>
+        <p-button
+          icon="pi pi-pencil"
+          [text]="true"
+          [rounded]="true"
+          size="small"
+          severity="info"
+          pTooltip="Editar Cliente"
+          tooltipPosition="top"
+          (click)="openEditClientDialog()"
+        />
       </div>
 
       <div class="detail-row">
@@ -122,6 +132,16 @@
       <!-- Endereço -->
       <div class="section-title-row">
         <p class="section-title">Endereço</p>
+        <p-button
+          icon="pi pi-pencil"
+          [text]="true"
+          [rounded]="true"
+          size="small"
+          severity="info"
+          pTooltip="Editar Endereço"
+          tooltipPosition="top"
+          (click)="openEditAddressDialog()"
+        />
       </div>
 
       <div class="detail-row">
@@ -395,5 +415,21 @@
     [type]="maintenance.type"
     [hasExecution]="maintenance.executionStatus === 'CONCLUIDO'"
     (saved)="reload()"
+  />
+
+  <app-client-dialog
+    mode="edit"
+    [(visible)]="clientDialogVisible"
+    [client]="{ id: maintenance.client.id, name: maintenance.client.name, personType: maintenance.client.personType, document: maintenance.client.document ?? null, isActive: maintenance.client.isActive, phones: maintenance.client.phones }"
+    [allowStatusToggle]="true"
+    (saved)="onClientSaved($event)"
+  />
+
+  <app-address-dialog
+    entityType="maintenance"
+    [(visible)]="addressDialogVisible"
+    [maintenanceId]="maintenance.id"
+    [address]="maintenance.address"
+    (saved)="onAddressSaved($event)"
   />
 }

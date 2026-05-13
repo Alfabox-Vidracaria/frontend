@@ -11,6 +11,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { SHARED_CRUD_IMPORTS } from '../../constants/shared-crud-imports';
 import { ServiceOrderService } from '../../services/service-order.service';
+import { MaintenanceService } from '../../services/maintenance.service';
 import { ServiceOrderAddress, UpdateAddress } from '../../models/service-order.model';
 
 @Component({
@@ -23,6 +24,7 @@ import { ServiceOrderAddress, UpdateAddress } from '../../models/service-order.m
 export class AddressDialogComponent implements OnChanges {
   private readonly fb = inject(FormBuilder);
   private readonly serviceOrderService = inject(ServiceOrderService);
+  private readonly maintenanceService = inject(MaintenanceService);
   private readonly messageService = inject(MessageService);
 
   // ── Inputs / Outputs ──────────────────────────────────────────────────
@@ -30,8 +32,14 @@ export class AddressDialogComponent implements OnChanges {
   @Input() visible = false;
   @Output() visibleChange = new EventEmitter<boolean>();
 
-  /** UUID da OS — obrigatório para o PATCH. */
+  /** Define se o dialog edita um endereço de OS ou de Manutenção. */
+  @Input() entityType: 'service-order' | 'maintenance' = 'service-order';
+
+  /** UUID da OS — obrigatório quando entityType === 'service-order'. */
   @Input() orderId = '';
+
+  /** UUID da Manutenção — obrigatório quando entityType === 'maintenance'. */
+  @Input() maintenanceId = '';
 
   /** Dados atuais do endereço para pré-preencher o formulário. */
   @Input() address: ServiceOrderAddress | null = null;
@@ -96,7 +104,12 @@ export class AddressDialogComponent implements OnChanges {
     };
 
     this.saving = true;
-    this.serviceOrderService.updateAddress(this.orderId, payload).subscribe({
+    const request$ =
+      this.entityType === 'maintenance'
+        ? this.maintenanceService.updateAddress(this.maintenanceId, payload)
+        : this.serviceOrderService.updateAddress(this.orderId, payload);
+
+    request$.subscribe({
       next: () => {
         this.saving = false;
         this.messageService.add({

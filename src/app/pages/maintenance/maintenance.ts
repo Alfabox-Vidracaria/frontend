@@ -4,13 +4,13 @@ import { ProgressBarModule } from 'primeng/progressbar';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { SHARED_CRUD_IMPORTS } from '../../shared/constants/shared-crud-imports';
+import { MaintenanceService } from '../../shared/services/maintenance.service';
 import {
-  MaintenanceService,
   MaintenanceListItem,
   MaintenancePaymentStatus,
   MaintenanceExecutionStatus,
   MaintenanceType,
-} from '../../shared/services/maintenance.service';
+} from '../../shared/models/maintenance.model';
 import { MaintenanceFilterStateService } from '../../shared/services/maintenance-filter-state.service';
 import { AuthService } from '../../shared/services/auth.service';
 import { fromApiDate, toApiDate } from '../../shared/utils/date.utils';
