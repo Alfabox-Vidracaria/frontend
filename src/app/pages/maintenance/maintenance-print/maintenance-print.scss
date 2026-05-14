@@ -1,0 +1,351 @@
+// ═══════════════════════════════════════════════════════════════════
+// Maintenance Print — Layout exclusivo para impressão A4 Retrato
+// ═══════════════════════════════════════════════════════════════════
+
+$blue:   #003399;
+$red:    #cc0000;
+$black:  #111111;
+$border: #003399;
+
+* {
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+  box-sizing: border-box;
+}
+
+:host {
+  display: block;
+}
+
+.print-page {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  padding: 8mm 10mm;
+  background: #fff;
+  color: $black;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 8pt;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// A. CABEÇALHO
+// ═══════════════════════════════════════════════════════════════════
+
+.header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 3mm;
+  gap: 4mm;
+}
+
+.header-logo-wrap {
+  flex: 0 0 50%;
+  display: flex;
+  align-items: center;
+}
+
+.header-logo {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.header-info {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2mm;
+  border: 1.5px solid $border;
+  padding: 2mm 3mm;
+}
+
+// Linha de tipo (checkboxes)
+.header-type-row {
+  display: flex;
+  gap: 4mm;
+  align-items: center;
+  border-bottom: 1px solid $border;
+  padding-bottom: 1.5mm;
+}
+
+.type-option {
+  display: flex;
+  align-items: center;
+  gap: 1.5mm;
+}
+
+.checkbox {
+  font-size: 11pt;
+  color: $blue;
+  line-height: 1;
+
+  &--checked::before {
+    content: '✔';
+    font-size: 9pt;
+    color: $blue;
+    display: inline-block;
+    width: 1em;
+    text-align: center;
+  }
+}
+
+// Override: when checked, show filled box
+.checkbox--checked {
+  // The &#9744; character is the empty checkbox. We replace the content.
+  font-size: 0; // hide the original character
+  &::before {
+    font-size: 11pt;
+    content: '☑';
+    color: $blue;
+  }
+}
+
+.type-label {
+  font-size: 8pt;
+  color: $black;
+  font-weight: bold;
+}
+
+// Linhas de meta (código, OS, data)
+.header-meta-row {
+  display: flex;
+  gap: 5mm;
+  align-items: baseline;
+}
+
+.meta-field {
+  display: flex;
+  align-items: baseline;
+  gap: 1.5mm;
+}
+
+.field-label {
+  color: $blue;
+  font-weight: bold;
+  font-size: 7.5pt;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.field-value {
+  color: $black;
+  font-size: 8.5pt;
+  border-bottom: 1px solid $border !important;
+  flex: 1;
+  min-width: 6mm;
+  min-height: 4mm;
+  line-height: 1.4;
+
+  &--red {
+    color: $red;
+    font-weight: bold;
+    font-size: 10pt;
+    border-bottom: none !important;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// B. DADOS DO CLIENTE
+// ═══════════════════════════════════════════════════════════════════
+
+.dados-box {
+  border: 1.5px solid $border;
+  margin-top: 3mm;
+}
+
+.dados-row {
+  display: flex;
+}
+
+.dados-field {
+  display: flex;
+  align-items: baseline;
+  padding: 1.5mm 3mm;
+  min-height: 6.5mm;
+
+  &--grow     { flex: 1 1 auto; }
+  &--doc      { flex: 0 0 26%; }
+  &--street   { flex: 0 0 70%; }
+  &--num      { flex: 0 0 30%; }
+  &--comp     { flex: 0 0 40%; }
+  &--third    { flex: 0 0 30%; }
+  &--contacts { flex: 1 1 auto; }
+}
+
+.phones-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 10mm;
+  flex: 1;
+  border-bottom: 1px solid $border !important;
+  min-height: 4mm;
+  align-items: flex-end;
+}
+
+.phone-item {
+  color: $black;
+  font-size: 8.5pt;
+  white-space: nowrap;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// C. TABELA DE PRODUTO + SERVIÇO + TOTAL
+// ═══════════════════════════════════════════════════════════════════
+
+.service-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1.5px solid $border;
+  margin-top: 3mm;
+
+  thead tr th {
+    background-color: $blue !important;
+    color: #fff !important;
+    font-weight: bold;
+    font-size: 8pt;
+    text-align: center;
+    padding: 1.2mm 2mm;
+    border-right: 1px solid #fff !important;
+    border-bottom: 1px solid #fff !important;
+    &:last-child { border-right: none !important; }
+  }
+
+  tbody tr td {
+    border-right: 1px solid $border !important;
+    border-bottom: 1px solid $border !important;
+    padding: 2mm 3mm;
+    font-size: 8.5pt;
+    color: $black;
+    min-height: 10mm;
+    vertical-align: top;
+    &:last-child { border-right: none !important; }
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none !important;
+  }
+
+  tfoot tr td {
+    border-right: 1px solid $border !important;
+    border-top: 1.5px solid $border !important;
+    padding: 1.5mm 3mm;
+    &:last-child { border-right: none !important; }
+  }
+
+  .col-section {
+    width: 14%;
+    text-align: center;
+  }
+
+  .col-desc {
+    // fills remaining space
+  }
+
+  .col-val {
+    width: 16%;
+    text-align: right;
+  }
+}
+
+.section-label {
+  color: $blue !important;
+  font-weight: bold !important;
+  font-size: 8pt !important;
+  vertical-align: middle !important;
+  text-align: center !important;
+}
+
+.total-row {
+  border-top: 1.5px solid $border;
+}
+
+.total-label-cell {
+  color: $blue !important;
+  font-weight: bold !important;
+  font-size: 9pt !important;
+  text-align: right !important;
+  padding-right: 4mm !important;
+  vertical-align: middle !important;
+  letter-spacing: 0.05em;
+}
+
+.total-value-cell {
+  color: $black;
+  font-weight: bold;
+  font-size: 10pt;
+  text-align: right !important;
+  vertical-align: middle !important;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// D. RESPONSÁVEIS
+// ═══════════════════════════════════════════════════════════════════
+
+.responsible-area {
+  display: flex;
+  align-items: baseline;
+  gap: 3mm;
+  margin-top: 8mm;
+}
+
+.responsible-label {
+  color: $blue;
+  font-weight: bold;
+  font-size: 8pt;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.responsible-line-wrap {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  border-bottom: 1px solid $border !important;
+  min-height: 5mm;
+}
+
+.responsible-value {
+  font-size: 8.5pt;
+  color: $black;
+}
+
+.responsible-underline {
+  flex: 1;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// @media print
+// ═══════════════════════════════════════════════════════════════════
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  :host {
+    display: block;
+  }
+
+  .print-page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0;
+    padding: 8mm 10mm;
+  }
+
+  .dados-box,
+  .service-table,
+  .responsible-area {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+}

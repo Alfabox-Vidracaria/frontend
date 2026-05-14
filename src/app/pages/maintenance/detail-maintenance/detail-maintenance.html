@@ -218,7 +218,7 @@
     </div>
     <div class="actions">
       <p-button icon="pi pi-link" [outlined]="true" pTooltip="Copiar link" tooltipPosition="top" (click)="copyLink()" [style]="{ height: '33px', width: '33px' }"></p-button>
-      <p-button label="Imprimir" outlined="true" icon="pi pi-print"></p-button>
+      <p-button label="Imprimir" outlined="true" icon="pi pi-print" (click)="printMaintenance()"></p-button>
       <p-button *hasRole="'ADMIN'" label="Excluir" severity="danger" icon="pi pi-trash" (click)="confirmDeleteMaintenance($event)"></p-button>
     </div>
   </div>
@@ -437,7 +437,7 @@
       <div class="detail-row">
         <div class="detail-field detail-field--grow">
           <span class="field-label">Descrição</span>
-          <span class="field-value field-value--muted">{{ maintenance.observation || '—' }}</span>
+          <span class="field-value field-value">{{ maintenance.observation || '—' }}</span>
         </div>
         @if (maintenance.type !== 'WARRANTY') {
           <div class="detail-field detail-field--right">

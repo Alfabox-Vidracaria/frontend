@@ -13,6 +13,14 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'manutencao/:code/imprimir',
+    loadComponent: () =>
+      import('./pages/maintenance/maintenance-print/maintenance-print').then(
+        (m) => m.MaintenancePrint,
+      ),
+    canActivate: [authGuard],
+  },
+  {
     path: '',
     loadComponent: () => import('./core/layout/layout').then((m) => m.Layout),
     canActivate: [authGuard],

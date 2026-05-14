@@ -187,6 +187,10 @@ export class DetailMaintenance implements OnInit {
     }
   }
 
+  printMaintenance(): void {
+    window.open(`/manutencao/${this.maintenance!.code}/imprimir`, '_blank');
+  }
+
   copyLink(): void {
     navigator.clipboard.writeText(window.location.href).then(() => {
       this.messageService.add({

@@ -393,7 +393,7 @@
             }
             <p-button *hasRole="'ADMIN'" icon="pi pi-wrench" [rounded]="true" [text]="true" severity="warn" pTooltip="Registrar Execução" tooltipPosition="top" [disabled]="m.executionStatus === 'CONCLUIDO'"
               (onClick)="openExecutionDialog(m)" />
-            <p-button icon="pi pi-print" [rounded]="true" [text]="true" severity="secondary" pTooltip="Imprimir" tooltipPosition="top" />
+            <p-button icon="pi pi-print" [rounded]="true" [text]="true" severity="secondary" pTooltip="Imprimir" tooltipPosition="top" (click)="printMaintenance(m.code)" />
           </td>
         </tr>
       </ng-template>

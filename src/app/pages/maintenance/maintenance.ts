@@ -151,6 +151,10 @@ export class Maintenance implements OnInit, OnDestroy {
     this.router.navigate(['/manutencao', code]);
   }
 
+  printMaintenance(code: string): void {
+    window.open(`/manutencao/${code}/imprimir`, '_blank');
+  }
+
   navigateByCode(): void {
     const code = this.codeSearchText.trim().toUpperCase();
     if (!code) return;

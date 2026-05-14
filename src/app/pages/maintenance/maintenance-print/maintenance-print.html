@@ -1,0 +1,168 @@
+@if (maintenance) {
+<div class="print-page">
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- A. CABEÇALHO                                               -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="header">
+
+    <div class="header-logo-wrap">
+      <img src="assets/logo-maintenance.png" alt="Alfabox Vidraçaria" class="header-logo" />
+    </div>
+
+    <div class="header-info">
+
+      <!-- Linha 1: checkboxes de tipo -->
+      <div class="header-type-row">
+        <span class="type-option">
+          <span class="checkbox" [class.checkbox--checked]="isWarranty">&#9744;</span>
+          <span class="type-label">Manutenção (Garantia)</span>
+        </span>
+        <span class="type-option">
+          <span class="checkbox" [class.checkbox--checked]="!isWarranty">&#9744;</span>
+          <span class="type-label">Serviço Cobrado</span>
+        </span>
+      </div>
+
+      <!-- Linha 2: Código + OS de Origem -->
+      <div class="header-meta-row">
+        <span class="meta-field">
+          <span class="field-label">Código:</span>
+          <span class="field-value field-value--red">{{ maintenance.code }}</span>
+        </span>
+        <span class="meta-field">
+          <span class="field-label">OS Vinculada:</span>
+          <span class="field-value">{{ maintenance.serviceOrderCode ?? '' }}</span>
+        </span>
+      </div>
+
+      <!-- Linha 3: Data -->
+      <div class="header-meta-row">
+        <span class="meta-field">
+          <span class="field-label">Data:</span>
+          <span class="field-value">{{ toDate(maintenance.maintenanceDate) | date:'dd/MM/yyyy' }}</span>
+        </span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- B. DADOS DO CLIENTE                                        -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="dados-box">
+
+    <!-- Linha 1: Nome | CPF/CNPJ -->
+    <div class="dados-row">
+      <div class="dados-field dados-field--grow">
+        <span class="field-label">Nome:</span>
+        <span class="field-value">{{ maintenance.client.name }}</span>
+      </div>
+      <div class="dados-field dados-field--doc">
+        <span class="field-label">{{ documentLabel }}:</span>
+        <span class="field-value">{{ formatDocument() }}</span>
+      </div>
+    </div>
+
+    <!-- Linha 2: Rua | Nº -->
+    <div class="dados-row">
+      <div class="dados-field dados-field--street">
+        <span class="field-label">Rua/Av.:</span>
+        <span class="field-value">{{ maintenance.address.street ?? '' }}</span>
+      </div>
+      <div class="dados-field dados-field--num">
+        <span class="field-label">Número:</span>
+        <span class="field-value">{{ maintenance.address.addressNumber ?? '' }}</span>
+      </div>
+    </div>
+
+    <!-- Linha 3: Complemento | Bairro | Cidade -->
+    <div class="dados-row">
+      <div class="dados-field dados-field--comp">
+        <span class="field-label">Complemento:</span>
+        <span class="field-value">{{ maintenance.address.complement ?? '' }}</span>
+      </div>
+      <div class="dados-field dados-field--third">
+        <span class="field-label">Bairro:</span>
+        <span class="field-value">{{ maintenance.address.neighborhood ?? '' }}</span>
+      </div>
+      <div class="dados-field dados-field--third">
+        <span class="field-label">Cidade:</span>
+        <span class="field-value">{{ maintenance.address.city ?? '' }}</span>
+      </div>
+    </div>
+
+    <!-- Linha 4: Contatos -->
+    <div class="dados-row dados-row--last">
+      <div class="dados-field dados-field--contacts">
+        <span class="field-label">Contato(s):</span>
+        <div class="phones-list">
+          @for (phone of maintenance.client.phones; track phone.id) {
+            <span class="phone-item">{{ phone.number | phoneFormat }}</span>
+          }
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- C. PRODUTO + SERVIÇO + TOTAL                               -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <table class="service-table">
+    <thead>
+      <tr>
+        <th class="col-section">Seção</th>
+        <th class="col-desc">Descrição</th>
+        @if (!isWarranty) {
+          <th class="col-val">Valor</th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Produto -->
+      <tr>
+        <td class="col-section section-label">Produto</td>
+        <td class="col-desc">{{ maintenance.productDescription ?? '' }}</td>
+        @if (!isWarranty) {
+          <td class="col-val">
+            {{ maintenance.productAmount ? (maintenance.productAmount | currency:'BRL') : '' }}
+          </td>
+        }
+      </tr>
+      <!-- Serviço -->
+      <tr>
+        <td class="col-section section-label">Serviço</td>
+        <td class="col-desc">{{ maintenance.observation ?? '' }}</td>
+        @if (!isWarranty) {
+          <td class="col-val">
+            {{ maintenance.laborAmount ? (maintenance.laborAmount | currency:'BRL') : '' }}
+          </td>
+        }
+      </tr>
+    </tbody>
+    @if (!isWarranty) {
+      <tfoot>
+        <tr class="total-row">
+          <td colspan="2" class="total-label-cell">TOTAL</td>
+          <td class="col-val total-value-cell">
+            {{ maintenance.totalAmount | currency:'BRL' }}
+          </td>
+        </tr>
+      </tfoot>
+    }
+  </table>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- D. RESPONSÁVEIS                                            -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="responsible-area">
+    <span class="responsible-label">Funcionário(s) responsável(is):</span>
+    <div class="responsible-line-wrap">
+      <span class="responsible-value">{{ assemblerNames }}</span>
+      <span class="responsible-underline"></span>
+    </div>
+  </div>
+
+</div>
+}
