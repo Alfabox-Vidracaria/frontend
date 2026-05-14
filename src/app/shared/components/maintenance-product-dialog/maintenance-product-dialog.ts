@@ -7,6 +7,7 @@ import {
   Output,
   SimpleChanges,
 } from '@angular/core';
+import { CurrencyPipe } from '@angular/common';
 import { FormBuilder, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -23,7 +24,7 @@ export interface ProductSavedEvent {
 @Component({
   selector: 'app-maintenance-product-dialog',
   standalone: true,
-  imports: [...SHARED_CRUD_IMPORTS, InputNumberModule],
+  imports: [...SHARED_CRUD_IMPORTS, InputNumberModule, CurrencyPipe],
   templateUrl: './maintenance-product-dialog.html',
   styleUrl: './maintenance-product-dialog.scss',
 })
@@ -48,6 +49,9 @@ export class MaintenanceProductDialogComponent implements OnChanges {
 
   /** Valor atual do produto (null = sem produto). */
   @Input() productAmount: number | null = null;
+
+  /** Valor atual de mão de obra — usado apenas para o preview do total. */
+  @Input() laborAmount = 0;
 
   /**
    * Emitido após salvar com sucesso.
@@ -75,6 +79,14 @@ export class MaintenanceProductDialogComponent implements OnChanges {
 
   get header(): string {
     return this.productDescription ? 'Editar Produto' : 'Adicionar Produto';
+  }
+
+  get previewProduct(): number {
+    return this.form.controls.productAmount.value ?? 0;
+  }
+
+  get previewTotal(): number {
+    return this.previewProduct + this.laborAmount;
   }
 
   // ── Lifecycle ─────────────────────────────────────────────────────────

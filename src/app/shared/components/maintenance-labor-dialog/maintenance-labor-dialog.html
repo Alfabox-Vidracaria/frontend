@@ -50,6 +50,25 @@
 
     </div>
 
+    @if (!isWarranty) {
+      <div class="total-preview">
+        <div class="preview-term preview-term--static">
+          <span class="preview-label">Produto</span>
+          <span class="preview-value">{{ productAmount | currency:'BRL' }}</span>
+        </div>
+        <span class="preview-sep">+</span>
+        <div class="preview-term preview-term--active">
+          <span class="preview-label">Mão de obra</span>
+          <span class="preview-value">{{ previewLabor | currency:'BRL' }}</span>
+        </div>
+        <span class="preview-sep">=</span>
+        <div class="preview-term preview-term--total">
+          <span class="preview-label">Novo total</span>
+          <span class="preview-value">{{ previewTotal | currency:'BRL' }}</span>
+        </div>
+      </div>
+    }
+
   </form>
 
   <ng-template #footer>

@@ -7,6 +7,7 @@ import {
   Output,
   SimpleChanges,
 } from '@angular/core';
+import { CurrencyPipe } from '@angular/common';
 import { FormBuilder, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -18,7 +19,7 @@ import { MaintenanceType } from '../../models/maintenance.model';
 @Component({
   selector: 'app-maintenance-labor-dialog',
   standalone: true,
-  imports: [...SHARED_CRUD_IMPORTS, InputNumberModule, TextareaModule],
+  imports: [...SHARED_CRUD_IMPORTS, InputNumberModule, CurrencyPipe],
   templateUrl: './maintenance-labor-dialog.html',
   styleUrl: './maintenance-labor-dialog.scss',
 })
@@ -44,6 +45,9 @@ export class MaintenanceLaborDialogComponent implements OnChanges {
   /** Valor atual de mão de obra. */
   @Input() laborAmount = 0;
 
+  /** Valor atual do produto — usado apenas para o preview do total. */
+  @Input() productAmount = 0;
+
   /** Emitido após salvar com sucesso, para a tela pai recarregar os dados. */
   @Output() saved = new EventEmitter<void>();
 
@@ -60,6 +64,14 @@ export class MaintenanceLaborDialogComponent implements OnChanges {
 
   get isWarranty(): boolean {
     return this.type === 'WARRANTY';
+  }
+
+  get previewLabor(): number {
+    return this.form.controls.laborAmount.value ?? 0;
+  }
+
+  get previewTotal(): number {
+    return this.previewLabor + this.productAmount;
   }
 
   // ── Lifecycle ─────────────────────────────────────────────────────────

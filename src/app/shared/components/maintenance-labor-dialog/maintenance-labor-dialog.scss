@@ -31,3 +31,60 @@
 .field-amount {
   flex: 0 0 10rem;
 }
+
+// ── Preview do total estimado ────────────────────────────────────────────────
+
+.total-preview {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 0.625rem;
+  padding-top: 0.875rem;
+  border-top: 1px solid var(--p-surface-200);
+}
+
+.preview-term {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.125rem;
+}
+
+.preview-label {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--p-text-muted-color);
+}
+
+.preview-sep {
+  color: var(--p-text-muted-color);
+  font-size: 0.875rem;
+  padding-bottom: 0.2rem;
+}
+
+.preview-term--active .preview-value {
+  color: var(--p-primary-color);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.preview-term--static .preview-value {
+  color: var(--p-text-muted-color);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.preview-term--total {
+  .preview-label {
+    color: var(--p-text-color);
+  }
+
+  .preview-value {
+    color: var(--p-text-color);
+    font-weight: 700;
+    font-size: 1rem;
+    font-variant-numeric: tabular-nums;
+  }
+}
