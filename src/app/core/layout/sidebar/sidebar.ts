@@ -83,6 +83,11 @@ export class Sidebar implements OnInit {
             icon: 'pi pi-fw pi-hammer',
             routerLink: '/relatorios/manutencao',
           },
+          {
+            label: 'Pagamentos',
+            icon: 'pi pi-fw pi-dollar',
+            routerLink: '/relatorios/pagamentos',
+          },
         ],
       },
     ];

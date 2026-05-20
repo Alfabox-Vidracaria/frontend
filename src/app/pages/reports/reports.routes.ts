@@ -24,4 +24,8 @@ export const REPORTS_ROUTES: Routes = [
         (m) => m.MaintenancesAssemblers,
       ),
   },
+  {
+    path: 'pagamentos',
+    loadComponent: () => import('./payments/payments').then((m) => m.Payments),
+  },
 ];

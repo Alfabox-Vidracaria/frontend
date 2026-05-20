@@ -96,6 +96,41 @@ export class ReportsService {
 
     return this.http.get<OrdersReportResponse>(`${this.baseUrl}/orders`, { params });
   }
+
+  getPaymentsReport(filters: PaymentsReportFilter): Observable<PaymentsReportResponse> {
+    let params = new HttpParams();
+
+    if (filters.startDate) params = params.set('startDate', filters.startDate);
+    if (filters.endDate) params = params.set('endDate', filters.endDate);
+    if (filters.origin) params = params.set('origin', filters.origin);
+    if (filters.paymentMethod) params = params.set('paymentMethod', filters.paymentMethod);
+
+    return this.http.get<PaymentsReportResponse>(`${this.baseUrl}/payments`, { params });
+  }
+
+  getPaymentsChartMonthly(filters: PaymentsChartMonthlyFilter): Observable<PaymentsChartResponse> {
+    let params = new HttpParams()
+      .set('year', String(filters.year))
+      .set('month', String(filters.month));
+
+    if (filters.origin) params = params.set('origin', filters.origin);
+    if (filters.paymentMethod) params = params.set('paymentMethod', filters.paymentMethod);
+
+    return this.http.get<PaymentsChartResponse>(`${this.baseUrl}/payments/charts/monthly`, {
+      params,
+    });
+  }
+
+  getPaymentsChartYearly(filters: PaymentsChartYearlyFilter): Observable<PaymentsChartResponse> {
+    let params = new HttpParams().set('year', String(filters.year));
+
+    if (filters.origin) params = params.set('origin', filters.origin);
+    if (filters.paymentMethod) params = params.set('paymentMethod', filters.paymentMethod);
+
+    return this.http.get<PaymentsChartResponse>(`${this.baseUrl}/payments/charts/yearly`, {
+      params,
+    });
+  }
 }
 
 export interface OrderReportItem {
@@ -116,4 +151,69 @@ export interface OrdersReportFilter {
   startDate: string;
   endDate: string;
   sellerId?: string;
+}
+
+// ── Pagamentos ────────────────────────────────────────────────────────
+
+export type PaymentOrigin = 'OS' | 'MAINTENANCE';
+export type PaymentMethod = 'DINHEIRO' | 'CARTAO_CREDITO' | 'CARTAO_DEBITO' | 'PIX';
+
+export interface PaymentsReportFilter {
+  startDate?: string;
+  endDate?: string;
+  origin?: PaymentOrigin;
+  paymentMethod?: PaymentMethod;
+}
+
+export interface KpiMetric {
+  value: number;
+  count: number;
+}
+
+export interface PaymentsKpis {
+  totalAmount: KpiMetric;
+  pixAmount: KpiMetric;
+  cashAmount: KpiMetric;
+  creditAmount: KpiMetric;
+  debitAmount: KpiMetric;
+}
+
+export interface PaymentReportItem {
+  id: string;
+  origin: PaymentOrigin;
+  code: string;
+  paymentDate: string;
+  method: PaymentMethod;
+  installments: number | null;
+  amount: number;
+}
+
+export interface PaymentsReportResponse {
+  kpis: PaymentsKpis;
+  payments: PaymentReportItem[];
+}
+
+// ── Gráficos de Pagamentos ────────────────────────────────────────────
+
+export interface PaymentsChartDataset {
+  label: string;
+  data: number[];
+}
+
+export interface PaymentsChartResponse {
+  labels: string[];
+  datasets: PaymentsChartDataset[];
+}
+
+export interface PaymentsChartMonthlyFilter {
+  year: number;
+  month: number;
+  origin?: PaymentOrigin;
+  paymentMethod?: PaymentMethod;
+}
+
+export interface PaymentsChartYearlyFilter {
+  year: number;
+  origin?: PaymentOrigin;
+  paymentMethod?: PaymentMethod;
 }

@@ -1,0 +1,376 @@
+<div class="page">
+
+  <!-- ═══ Título ═══ -->
+  <div class="title">
+    <h1><span>|</span> Pagamentos</h1>
+  </div>
+
+  <!-- ═══ Filtros Globais ═══ -->
+  <div class="card">
+    <div class="global-filters">
+
+      <p-floatlabel variant="on">
+        <p-select
+          inputId="origin_select"
+          [(ngModel)]="selectedOrigin"
+          (ngModelChange)="onGlobalFilterChange()"
+          [options]="originOptions"
+          optionLabel="label"
+          optionValue="value"
+          [showClear]="true"
+          placeholder=" "
+          appendTo="body"
+          [style]="{ 'min-width': '16rem' }"
+        />
+        <label for="origin_select">Origem</label>
+      </p-floatlabel>
+
+      <p-floatlabel variant="on">
+        <p-select
+          inputId="method_select"
+          [(ngModel)]="selectedMethod"
+          (ngModelChange)="onGlobalFilterChange()"
+          [options]="methodOptions"
+          optionLabel="label"
+          optionValue="value"
+          [showClear]="true"
+          placeholder=" "
+          appendTo="body"
+          [style]="{ 'min-width': '16rem' }"
+        />
+        <label for="method_select">Método de Pagamento</label>
+      </p-floatlabel>
+
+    </div>
+  </div>
+
+  <!-- ═══ Card Principal ═══ -->
+  <div class="card">
+
+    <h3><span><i class="pi pi-list"></i></span> Registros do Período</h3>
+
+    <!-- ── Toolbar de Filtros de Data ── -->
+    <div class="toolbar">
+      <div class="toolbar-left">
+
+        <p-floatlabel variant="on">
+          <p-datepicker
+            inputId="month_picker"
+            [(ngModel)]="selectedMonth"
+            (ngModelChange)="onMonthSelect($event)"
+            view="month"
+            dateFormat="MM/yy"
+            [readonlyInput]="true"
+            showIcon
+            iconDisplay="input"
+            appendTo="body"
+            [inputStyle]="{ width: '12rem' }"
+          />
+          <label for="month_picker">Mês</label>
+        </p-floatlabel>
+
+        <p-floatlabel variant="on">
+          <p-datepicker
+            inputId="start_date"
+            [(ngModel)]="startDate"
+            (ngModelChange)="onStartDateChange($event)"
+            dateFormat="dd/mm/yy"
+            showIcon
+            iconDisplay="input"
+            [readonlyInput]="true"
+            appendTo="body"
+            [inputStyle]="{ width: '10rem' }"
+          />
+          <label for="start_date">Início</label>
+        </p-floatlabel>
+
+        <p-floatlabel variant="on">
+          <p-datepicker
+            inputId="end_date"
+            [(ngModel)]="endDate"
+            (ngModelChange)="onEndDateChange($event)"
+            dateFormat="dd/mm/yy"
+            showIcon
+            iconDisplay="input"
+            [readonlyInput]="true"
+            appendTo="body"
+            [inputStyle]="{ width: '10rem' }"
+          />
+          <label for="end_date">Fim</label>
+        </p-floatlabel>
+
+      </div>
+    </div>
+
+    <!-- ── KPIs + Gráfico ── -->
+    @if (loading || !report || report.kpis.totalAmount.count > 0) {
+    <div class="kpi-chart-row">
+
+      <!-- KPIs (esquerda) -->
+      <div class="kpi-section">
+
+        <!-- Total Recebido -->
+        <div class="kpi-card kpi-card--total">
+          <div class="kpi-body">
+            <div class="kpi-left">
+              <i class="pi pi-wallet kpi-icon"></i>
+              <div class="kpi-info">
+                <span class="kpi-label">Total Recebido</span>
+                <!-- Se for 1 transação, exibe no singular -->
+                <span class="kpi-count">{{ (report?.kpis?.totalAmount?.count ?? 0) }} {{ (report?.kpis?.totalAmount?.count === 1) ? 'transação' : 'transações' }}</span>
+              </div>
+            </div>
+            <span class="kpi-value">{{ (report?.kpis?.totalAmount?.value ?? 0) | currency:'BRL' }}</span>
+          </div>
+        </div>
+
+        <!-- Linha: PIX + Dinheiro -->
+        <div class="kpi-row">
+          <div class="kpi-card kpi-card--pix">
+            <div class="kpi-body">
+              <div class="kpi-left">
+                <i class="pi pi-qrcode kpi-icon"></i>
+                <div class="kpi-info">
+                  <span class="kpi-label">PIX</span>
+                  <span class="kpi-count">{{ (report?.kpis?.pixAmount?.count ?? 0) }} {{ (report?.kpis?.pixAmount?.count === 1) ? 'transação' : 'transações' }}</span>
+                </div>
+              </div>
+              <span class="kpi-value">{{ (report?.kpis?.pixAmount?.value ?? 0) | currency:'BRL' }}</span>
+            </div>
+          </div>
+
+          <div class="kpi-card kpi-card--dinheiro">
+            <div class="kpi-body">
+              <div class="kpi-left">
+                <i class="pi pi-money-bill kpi-icon"></i>
+                <div class="kpi-info">
+                  <span class="kpi-label">Dinheiro</span>
+                  <span class="kpi-count">{{ (report?.kpis?.cashAmount?.count ?? 0) }} {{ (report?.kpis?.cashAmount?.count === 1) ? 'transação' : 'transações' }}</span>
+                </div>
+              </div>
+              <span class="kpi-value">{{ (report?.kpis?.cashAmount?.value ?? 0) | currency:'BRL' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Linha: Crédito + Débito -->
+        <div class="kpi-row">
+          <div class="kpi-card kpi-card--credito">
+            <div class="kpi-body">
+              <div class="kpi-left">
+                <i class="pi pi-credit-card kpi-icon"></i>
+                <div class="kpi-info">
+                  <span class="kpi-label">Crédito</span>
+                  <span class="kpi-count">{{ (report?.kpis?.creditAmount?.count ?? 0) }} {{ (report?.kpis?.creditAmount?.count === 1) ? 'transação' : 'transações' }}</span>
+                </div>
+              </div>
+              <span class="kpi-value">{{ (report?.kpis?.creditAmount?.value ?? 0) | currency:'BRL' }}</span>
+            </div>
+          </div>
+
+          <div class="kpi-card kpi-card--debito">
+            <div class="kpi-body">
+              <div class="kpi-left">
+                <i class="pi pi-credit-card kpi-icon"></i>
+                <div class="kpi-info">
+                  <span class="kpi-label">Débito</span>
+                  <span class="kpi-count">{{ (report?.kpis?.debitAmount?.count ?? 0) }} {{ (report?.kpis?.debitAmount?.count === 1) ? 'transação' : 'transações' }}</span>
+                </div>
+              </div>
+              <span class="kpi-value">{{ (report?.kpis?.debitAmount?.value ?? 0) | currency:'BRL' }}</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Gráfico de Rosca (direita) -->
+      <div class="chart-section">
+        <div class="chart-title">Distribuição por Método</div>
+        @if (chartData) {
+          <p-chart
+            type="doughnut"
+            [data]="chartData"
+            [options]="chartOptions"
+            class="chart-container"
+          />
+        } @else {
+          <div class="chart-empty">Sem dados no período</div>
+        }
+      </div>
+
+    </div>
+    } @else {
+      <div class="empty-state">
+        <i class="pi pi-inbox"></i>
+        <span>Nenhum pagamento encontrado para os filtros selecionados.</span>
+      </div>
+    }
+
+    <!-- ── Tabela ── -->
+    <p-table
+      stripedRows
+      [size]="'large'"
+      [scrollable]="true"
+      scrollHeight="570px"
+      [value]="payments"
+      [loading]="loading"
+      [tableStyle]="{ 'table-layout': 'auto' }"
+      dataKey="id"
+    >
+
+      <ng-template #header>
+        <tr>
+          <th pSortableColumn="paymentDate">
+            <div class="column-header">Data <p-sortIcon field="paymentDate" /></div>
+          </th>
+          <th pSortableColumn="origin">
+            <div class="column-header">Origem <p-sortIcon field="origin" /></div>
+          </th>
+          <th pSortableColumn="method">
+            <div class="column-header">Método <p-sortIcon field="method" /></div>
+          </th>
+          <th pSortableColumn="installments" style="text-align: center">
+            <div class="column-header" style="justify-content: center">
+              Parcelas <p-sortIcon field="installments" />
+            </div>
+          </th>
+          <th pSortableColumn="amount">
+            <div class="column-header">Valor <p-sortIcon field="amount" /></div>
+          </th>
+          <th>
+            <div class="column-header">Código</div>
+          </th>
+        </tr>
+      </ng-template>
+
+      <ng-template #body let-item>
+        <tr>
+          <td>{{ item.paymentDate | date:'dd/MM/yyyy' }}</td>
+          <td>
+            <p-tag
+              [value]="getOriginLabel(item.origin)"
+              [severity]="getOriginSeverity(item.origin)"
+            />
+          </td>
+          <td>
+            <p-tag
+              [value]="getMethodLabel(item.method)"
+              [severity]="getMethodSeverity(item.method)"
+            />
+          </td>
+          <td style="text-align: center">
+            @if (item.method === 'CARTAO_CREDITO' && item.installments) {
+              {{ item.installments }}x
+            }
+          </td>
+          <td>{{ item.amount | currency:'BRL' }}</td>
+          <td>
+            <span class="code-link" (click)="navigateToItem(item)">
+              {{ item.code }}
+            </span>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template #emptymessage>
+        <tr style="height: 60px;">
+          <td colspan="6" class="empty-message">Nenhum pagamento encontrado para o período.</td>
+        </tr>
+      </ng-template>
+
+    </p-table>
+
+  </div>
+
+  <!-- ═══ Card: Distribuição por Dia do Mês ═══ -->
+  <div class="card">
+
+    <h3><span><i class="pi pi-calendar-times"></i></span> Distribuição por Dia</h3>
+
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <p-floatlabel variant="on">
+          <p-datepicker
+            inputId="chart_month_picker"
+            [(ngModel)]="chartMonth"
+            (ngModelChange)="onChartMonthChange()"
+            view="month"
+            dateFormat="MM/yy"
+            [readonlyInput]="true"
+            showIcon
+            iconDisplay="input"
+            appendTo="body"
+            [inputStyle]="{ width: '13rem' }"
+          />
+          <label for="chart_month_picker">Mês de referência</label>
+        </p-floatlabel>
+      </div>
+    </div>
+
+    @if (monthlyBarData) {
+      <p-chart
+        type="bar"
+        [data]="monthlyBarData"
+        [options]="monthlyBarOptions"
+        class="bar-chart-container"
+      />
+    } @else if (monthlyBarLoading) {
+      <div class="chart-loading">
+        <i class="pi pi-spin pi-spinner"></i>
+      </div>
+    } @else {
+      <div class="empty-state">
+        <i class="pi pi-inbox"></i>
+        <span>Nenhum pagamento encontrado para o mês selecionado.</span>
+      </div>
+    }
+
+  </div>
+
+  <!-- ═══ Card: Distribuição por Mês do Ano ═══ -->
+  <div class="card">
+
+    <h3><span><i class="pi pi-chart-bar"></i></span> Distribuição por Mês</h3>
+
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <p-floatlabel variant="on">
+          <p-datepicker
+            inputId="chart_year_picker"
+            [(ngModel)]="chartYear"
+            (ngModelChange)="onChartYearChange()"
+            view="year"
+            dateFormat="yy"
+            [readonlyInput]="true"
+            showIcon
+            iconDisplay="input"
+            appendTo="body"
+            [inputStyle]="{ width: '13rem' }"
+          />
+          <label for="chart_year_picker">Ano de referência</label>
+        </p-floatlabel>
+      </div>
+    </div>
+
+    @if (yearlyBarData) {
+      <p-chart
+        type="bar"
+        [data]="yearlyBarData"
+        [options]="yearlyBarOptions"
+        class="bar-chart-container"
+      />
+    } @else if (yearlyBarLoading) {
+      <div class="chart-loading">
+        <i class="pi pi-spin pi-spinner"></i>
+      </div>
+    } @else {
+      <div class="empty-state">
+        <i class="pi pi-inbox"></i>
+        <span>Nenhum pagamento encontrado para o ano selecionado.</span>
+      </div>
+    }
+
+  </div>
+
+</div>
