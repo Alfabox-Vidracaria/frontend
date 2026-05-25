@@ -8,5 +8,5 @@
  */
 export const environment = {
   production: true,
-  apiUrl: '/api',
+  apiUrl: 'https://alfabox-backend.onrender.com/api',
 };
