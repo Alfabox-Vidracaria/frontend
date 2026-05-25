@@ -18,7 +18,6 @@ import { PhoneFormatPipe } from '../../../shared/pipes/phone-format.pipe';
 import { SHARED_CRUD_IMPORTS } from '../../../shared/constants/shared-crud-imports';
 import { OsItemsInputComponent } from '../../../shared/components/os-items-input/os-items-input';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { TextareaModule } from 'primeng/textarea';
 import { Router } from '@angular/router';
 import { todayLocal, toApiDate } from '../../../shared/utils/date.utils';
 

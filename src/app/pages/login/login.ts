@@ -27,6 +27,7 @@ export class Login {
   });
 
   onSubmit(): void {
+    this.form.markAllAsTouched();
     if (this.form.invalid) return;
 
     this.loading = true;
