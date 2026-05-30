@@ -84,3 +84,7 @@ h1, h2, h3 {
     }
   }
 }
+
+@media (max-width: 768px) {
+  h1 { font-size: 1.4rem; }
+}
