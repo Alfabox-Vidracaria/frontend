@@ -191,6 +191,39 @@ h1, h2, h3 {
   span { font-size: 0.9rem; }
 }
 
+// ── Mobile ────────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  h1 { font-size: 1.4rem; }
+
+  // KPIs + gráfico empilhados verticalmente
+  .kpi-chart-row {
+    grid-template-columns: 1fr;
+
+    // min-width: auto (padrão do grid) faz os itens estourarem o container
+    .kpi-section, .chart-section { min-width: 0; width: 100%; }
+  }
+
+  // Gráfico não ultrapassa o card
+  .chart-container { width: 100%; }
+  :host ::ng-deep .p-chart canvas { max-width: 100%; }
+
+  .kpi-card {
+    padding: 0.65rem 0.85rem;
+
+    .kpi-body { flex-direction: column; align-items: flex-start; gap: 0.3rem; }
+    .kpi-left { gap: 0.4rem; }
+    .kpi-label { font-size: 0.6rem; white-space: normal; }
+    .kpi-count { font-size: 0.55rem; white-space: normal; }
+    .kpi-icon { font-size: 1rem; }
+    .kpi-value { font-size: 1rem; white-space: normal; }
+
+    &--total {
+      .kpi-value { font-size: 1.2rem; }
+      .kpi-icon { font-size: 1.2rem; }
+    }
+  }
+}
+
 // ── Tabela ────────────────────────────────────────────────────────────
 .column-header {
   display: flex;
