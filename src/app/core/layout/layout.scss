@@ -41,3 +41,9 @@ app-header {
   padding: 2rem; /* Espaçamento interno padrão */
   background-color: var(--p-surface-50); /* Fundo opcional para contraste */
 }
+
+@media (max-width: 768px) {
+  .content-container {
+    padding: 1rem;
+  }
+}
